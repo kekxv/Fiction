@@ -50,6 +50,7 @@
             </div>
         </div>
         <div v-text="search?'＋':'－'" class="book_list_love" @click="search?AddBook(el):DelBook(el)">＋</div>
+        <div class="book_list_readed" v-if="!search" >{{el.CatalogIndex+1}}/{{el.catalog.length}}</div>
     </div>
 </div>
 <div class="bookCatalog" v-if="book.catalog && book.catalog.length>0">

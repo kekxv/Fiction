@@ -129,6 +129,14 @@ div.bookShelf div.book_list > div > div {
     height: 135px;
 }
 
+div.bookShelf div.book_list div.book_list_readed {
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+    border-radius: 3px;
+    background: #dccbab;
+    padding: 0 10px;
+}
 div.bookShelf div.book_list div.book_list_love {
     position: absolute;
     right: 5px;
