@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="canonical" href="https://weather-pwa-sample.firebaseapp.com/final/">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/class/bootcss.buttons.css">
+
+    <!-- TODO add manifest here -->
+    <link rel="manifest" href="./manifest.json">
+    <!-- Add to home screen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Weather PWA">
+    <meta name="msapplication-TileColor" content="#2F3BA2">
+    <title>Fiction</title>
+    <script src="JavaScript/class/jquery.min.js"></script>
+    <script src="JavaScript/class/layer/layer.js"></script>
+    <script src="JavaScript/class/Tools.js"></script>
+    <script src="JavaScript/class/JsNotification.js"></script>
+    <script src="JavaScript/class/Database.js"></script>
+    <script src="JavaScript/class/vue.js"></script>
+
+
+    <link rel="stylesheet" type="text/css" href="styles/inline.css">
+    <script src="JavaScript/API.js"></script>
+    <script src="JavaScript/model/huanyue123.js"></script>
+</head>
+<body>
+<div class="bookShelf">
+
+    <div class="book_list">
+        <form style="display: flex;" onsubmit="return false;">
+            <input style="flex: 1;margin-right: 10px;" v-model="searchKeyword" placeholder="请输入要搜索的小说">
+            <button type="submit" class="button button-border button-rounded" @click="searchBook()"
+                    v-text="searchKeyword.length==0?'书架':'搜索'"></button>
+        </form>
+    </div>
+    <div class="book_list" v-for="el in list">
+        <div @click="search?showCatalog(el):ReadBook(el)">
+            <div>
+                <img :src="el.data.image"/>
+            </div>
+            <div>
+                <div><span>{{el.title}}</span></div>
+                <div><span>{{el.data.author}}</span></div>
+                <div v-if="el.data.time"><span>{{el.data.time}}</span></div>
+                <div><span>{{el.data.state}}</span></div>
+            </div>
+        </div>
+        <div v-text="search?'＋':'－'" class="book_list_love" @click="search?AddBook(el):DelBook(el)">＋</div>
+    </div>
+</div>
+<div class="bookCatalog" v-if="book.catalog && book.catalog.length>0">
+    <div @click="book={}">
+    </div>
+    <div>
+        <div class="bookCatalog_Catalog"><span>目录</span><span @click="GoBottom($event)">最新</span></div>
+        <div class="book_catalog" v-for="el,index in book.catalog " @click="GoReadBook(book,index)">
+            <p>
+                <span>{{el.title}}</span>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="bookRead" v-if="CatalogIndex!=-1">
+    <div class="bookRead_Catalog" v-text="book.catalog[CatalogIndex].title"></div>
+    <div class="content" v-html="content" @click="TouchBook($event)"></div>
+    <div class="bookRead_Menu" v-if="showMenu">
+        <div @click="menu(0)">上一章</div>
+        <div @click="menu(3)">目录</div>
+        <div @click="menu(1)">返回</div>
+        <div @click="menu(2)">下一章</div>
+    </div>
+</div>
+</body>
+<script src="JavaScript/main.js"></script>
+</html>
