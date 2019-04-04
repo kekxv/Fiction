@@ -83,8 +83,9 @@ let bookShelf = new Vue({
                     if (bookShelf.list.hasOwnProperty(i)) {
                         let item = bookShelf.list[i];
                         api.update(item.data).then(async function (bookinfo) {
-                            let isUpdate = item.data.state.trim() !== bookinfo.state.trim();
+                            let isUpdate = item.data.time.trim() !== bookinfo.time.trim();
                             if (isUpdate) {
+                                layer.msg(`《${bookinfo.title}》有更新。。`, {icon: 1});
                                 item.data = bookinfo;
                                 item.catalog = await api.catalog(bookinfo.url);
                                 DB.Update({
@@ -92,7 +93,6 @@ let bookShelf = new Vue({
                                     objectStore: "books",
                                     data: item,
                                     success: function (e) {
-                                        layer.msg(`《${bookinfo.title}》有更新。。`, {icon: 1});
                                     },
                                     error: function (e) {
                                         layer.msg('更新失败。。', {icon: 2});
