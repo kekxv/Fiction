@@ -23,9 +23,9 @@
     <script src="JavaScript/class/vue.js"></script>
 
 
-    <link rel="stylesheet" type="text/css" href="styles/inline.css?v=2019040408">
-    <script src="JavaScript/API.js?v=2019040408"></script>
-    <script src="JavaScript/model/huanyue123.js?v=2019040408"></script>
+    <link rel="stylesheet" type="text/css" href="styles/inline.css?v=2019040417">
+    <script src="JavaScript/API.js?v=2019040417"></script>
+    <script src="JavaScript/model/huanyue123.js?v=2019040417"></script>
 </head>
 <body>
 <div class="bookShelf">
@@ -37,7 +37,10 @@
                     v-text="searchKeyword.length==0?'书架':'搜索'"></button>
         </form>
     </div>
-    <div class="book_list" v-for="el in list">
+    <div class="book_list" v-if="isUpdating > 0" style="font-size: 14px;padding: 3px;text-align: center;">
+        正在更新
+    </div>
+    <div class="book_list" v-for="el in list" :class="{'hasUpdate':(el.CatalogIndex||-1)+1< el.catalog.length}">
         <div @click="search?showCatalog(el):ReadBook(el)">
             <div>
                 <img :src="el.data.image"/>
@@ -50,7 +53,7 @@
             </div>
         </div>
         <div v-text="search?'＋':'－'" class="book_list_love" @click="search?AddBook(el):DelBook(el)">＋</div>
-        <div class="book_list_readed" v-if="!search" >{{el.CatalogIndex+1}}/{{el.catalog.length}}</div>
+        <div class="book_list_readed" v-if="!search">{{(el.CatalogIndex||-1)+1}}/{{el.catalog.length}}</div>
     </div>
 </div>
 <div class="bookCatalog" v-if="book.catalog && book.catalog.length>0">
@@ -77,5 +80,5 @@
     </div>
 </div>
 </body>
-<script src="JavaScript/main.js?v=2019040408"></script>
+<script src="JavaScript/main.js?v=2019040417"></script>
 </html>

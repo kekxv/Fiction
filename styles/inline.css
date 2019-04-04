@@ -247,3 +247,8 @@ div.bookRead > .bookRead_Menu > div{
     color: purple;
     font-weight: bold;
 }
+
+div.bookShelf div.book_list.hasUpdate{
+    box-shadow: 0 0 3px #03A9F4;
+    background: #eff9ff;
+}

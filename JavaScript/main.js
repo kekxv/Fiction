@@ -22,6 +22,7 @@ let bookShelf = new Vue({
     el: ".bookShelf",
     data: {
         search: false,
+        isUpdating: 0,
         list: [],
         searchKeyword: ""
     },
@@ -59,6 +60,7 @@ let bookShelf = new Vue({
             bookRead.CatalogIndex = book.CatalogIndex;
         },
         UpdateData: function () {
+            let self = this;
             let da = [];
             let index = layer.load(1, {
                 shade: [0.2, '#FFF'] //0.1透明度的白色背景
@@ -81,24 +83,33 @@ let bookShelf = new Vue({
 
                 for (let i in bookShelf.list) {
                     if (bookShelf.list.hasOwnProperty(i)) {
+                        self.isUpdating++;
                         let item = bookShelf.list[i];
+                        let time = item.data.time;
                         api.update(item.data).then(async function (bookinfo) {
-                            let isUpdate = item.data.time.trim() !== bookinfo.time.trim();
-                            if (isUpdate) {
-                                layer.msg(`《${bookinfo.title}》有更新。。`, {icon: 1});
-                                item.data = bookinfo;
-                                item.catalog = await api.catalog(bookinfo.url);
-                                DB.Update({
-                                    StoreArray: ["books"],
-                                    objectStore: "books",
-                                    data: item,
-                                    success: function (e) {
-                                    },
-                                    error: function (e) {
-                                        layer.msg('更新失败。。', {icon: 2});
-                                    }
-                                });
+                            try {
+                                let isUpdate = time.trim() !== bookinfo.time.trim();
+                                if (isUpdate) {
+                                    item.data = bookinfo;
+                                    item.catalog = await api.catalog(bookinfo.url);
+                                    layer.msg(`《${bookinfo.title}》有更新。。`, {icon: 1});
+                                    DB.Update({
+                                        StoreArray: ["books"],
+                                        objectStore: "books",
+                                        data: item,
+                                        success: function (e) {
+                                        },
+                                        error: function (e) {
+                                            layer.msg('更新失败。。', {icon: 2});
+                                        }
+                                    });
+                                }
+                            }catch (e) {
+
                             }
+                            self.isUpdating--;
+                        }).catch(function () {
+                            self.isUpdating--;
                         });
                     }
                 }
