@@ -52,6 +52,7 @@ let bookShelf = new Vue({
             layer.close(index);
         },
         ReadBook: function (book) {
+            book.CatalogIndex = book.CatalogIndex === undefined ? -1 : book.CatalogIndex;
             if (book.CatalogIndex < 0) {
                 this.showCatalog(book, book.catalog.length > 0);
                 return;
@@ -88,7 +89,7 @@ let bookShelf = new Vue({
                         let time = item.data.time;
                         api.update(item.data).then(async function (bookinfo) {
                             try {
-                                let isUpdate = time.trim() !== bookinfo.time.trim();
+                                let isUpdate = (!item.catalog || item.catalog.length === 0) || time.trim() !== bookinfo.time.trim();
                                 if (isUpdate) {
                                     item.data = bookinfo;
                                     item.catalog = await api.catalog(bookinfo.url);
@@ -98,13 +99,14 @@ let bookShelf = new Vue({
                                         objectStore: "books",
                                         data: item,
                                         success: function (e) {
+                                            self.UpdateBooksCache(item);
                                         },
                                         error: function (e) {
                                             layer.msg('更新失败。。', {icon: 2});
                                         }
                                     });
                                 }
-                            }catch (e) {
+                            } catch (e) {
 
                             }
                             self.isUpdating--;
@@ -117,6 +119,64 @@ let bookShelf = new Vue({
                 bookShelf.search = false;
                 layer.close(index);
             });
+        },
+        UpdateBooksCache: async function (bookinfo) {
+            if (bookinfo.CatalogIndex === undefined || bookinfo.CatalogIndex === -1) {
+                return;
+            }
+            let self = this;
+            let _da = [];
+            await new Promise((resolve, reject) => {
+                DB.ReadAll({
+                    StoreArray: ["booksCache"],
+                    objectStore: "booksCache",
+                    key: bookinfo.title,
+                    index: "title",
+                    success: function (cursor, value) {
+                        if (cursor) {
+                            if (value.CatalogIndex < bookinfo.CatalogIndex) {
+                                DB.Remove({
+                                    StoreArray: ["booksCache"],
+                                    objectStore: "booksCache",
+                                    key: value.CatalogUrl,
+                                    success: function (result) {
+                                    },
+                                    error: function (result) {
+                                    }
+                                });
+                            }else if(value.CatalogIndex > bookinfo.CatalogIndex + 4){
+
+                            } else {
+                                _da.push(value)
+                            }
+                        } else {
+                            resolve(_da);
+                        }
+                        return true;
+                    }
+                });
+            });
+            for (let i = _da.length; i < 4; i++) {
+                if (bookinfo.catalog && bookinfo.catalog.length > bookinfo.CatalogIndex + i) {
+                    let d = {
+                        CatalogUrl: bookinfo.catalog[bookinfo.CatalogIndex + i].url,
+                        title: bookinfo.title,
+                        content: await api.content(bookinfo.catalog[bookinfo.CatalogIndex + i]),
+                        CatalogIndex: bookinfo.CatalogIndex + i
+                    };
+                    DB.Update({
+                        StoreArray: ["booksCache"],
+                        objectStore: "booksCache",
+                        data: d,
+                        success: function (e) {
+                        },
+                        error: function (e) {
+                        }
+                    });
+                } else {
+                    break;
+                }
+            }
         },
         searchBook: async function () {
             if (this.searchKeyword.length === 0) {
@@ -169,6 +229,11 @@ let bookCatalog = new Vue({
     , watch: {
         list: function (newVal, oldVal) {
             this.isAlive = newVal.length > 0;
+        },
+        isAlive: function (newVal, oldVal) {
+            if (newVal) {
+                if (history.state == null) history.pushState({}, null, location.href);
+            }
         }
     }
     , methods: {
@@ -180,7 +245,7 @@ let bookCatalog = new Vue({
             bookRead.book = book;
             bookRead.CatalogIndex = index;
         }
-    }
+    },
 });
 let bookRead = new Vue({
     el: ".bookRead",
@@ -271,12 +336,53 @@ let bookRead = new Vue({
     watch: {
         CatalogIndex: async function (newVal, oldVal) {
             this.showMenu = false;
+            this.content = "";
             if (newVal > -1) {
+                if (history.state == null) history.pushState({}, null, location.href);
                 let index = layer.load(1, {
                     shade: [0.2, '#FFF'] //0.1透明度的白色背景,
                 });
                 // console.log(this.book.catalog[newVal]);
-                this.content = await api.content(this.book.catalog[newVal]);
+
+
+                let catalog = await new Promise((resolve, reject) => {
+                    DB.ReadAll({
+                        StoreArray: ["booksCache"],
+                        objectStore: "booksCache",
+                        key: this.book.catalog[newVal].url,
+                        success: function (cursor, value) {
+                            if (cursor) {
+                                resolve(value);
+                                return false;
+                            } else {
+                                resolve(null);
+                            }
+                            return true;
+                        }
+                    });
+                });
+
+                if (catalog == null) {
+                    let d = {
+                        CatalogUrl: this.book.catalog[newVal].url,
+                        title: this.book.title,
+                        content: await api.content(this.book.catalog[newVal]),
+                        CatalogIndex: newVal
+                    };
+                    this.content = d.content;
+                    DB.Update({
+                        StoreArray: ["booksCache"],
+                        objectStore: "booksCache",
+                        data: d,
+                        success: function (e) {
+                        },
+                        error: function (e) {
+                        }
+                    });
+                } else {
+                    this.content = catalog.content;
+                }
+                bookShelf.UpdateBooksCache(this.book);
                 this.book.CatalogIndex = newVal;
                 DB.Update({
                     StoreArray: ["books"],
@@ -306,7 +412,7 @@ let api = new API(huanyue123, "http://127.0.0.1/ProxyCrossDomain/index.php");
 
 let DB = new Database({
     DB: "book"
-    , version: 1
+    , version: 2
     , ObjectStore: [
         {
             name: "books", keyPath: "title", Index: [
@@ -315,9 +421,33 @@ let DB = new Database({
                 , {name: "catalog", key: "catalog", unique: false}
                 , {name: "CatalogIndex", key: "CatalogIndex", unique: false}
             ]
-        }
+        },
+        {
+            name: "booksCache", keyPath: "CatalogUrl", Index: [
+                {name: "CatalogUrl", key: "CatalogUrl", unique: true}
+                , {name: "title", key: "title", unique: false}
+                , {name: "content", key: "content", unique: false}
+                , {name: "CatalogIndex", key: "CatalogIndex", unique: false}
+            ]
+        },
     ]
 });
 DB.ready = function () {
     bookShelf.UpdateData();
 };
+
+//拦截安卓回退按钮
+// history.pushState(null, null, location.href);
+window.addEventListener('popstate', function (event) {
+    if (bookRead.CatalogIndex !== -1) {
+        bookRead.CatalogIndex = -1;
+        if (bookCatalog.book.catalog && bookCatalog.book.catalog.length > 0)
+            history.pushState({}, null, location.href);
+        return;
+    }
+    if (bookCatalog.book.catalog && bookCatalog.book.catalog.length > 0) {
+        bookCatalog.book = {};
+        return;
+    }
+    console.log(event);
+});

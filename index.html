@@ -40,7 +40,7 @@
     <div class="book_list" v-if="isUpdating > 0" style="font-size: 14px;padding: 3px;text-align: center;">
         正在更新
     </div>
-    <div class="book_list" v-for="el in list" :class="{'hasUpdate':(el.CatalogIndex||-1)+1< el.catalog.length}">
+    <div class="book_list" v-for="el in list" :class="{'hasUpdate':(el.CatalogIndex==undefined?-1:el.CatalogIndex)+1< el.catalog.length}">
         <div @click="search?showCatalog(el):ReadBook(el)">
             <div>
                 <img :src="el.data.image"/>
@@ -53,7 +53,7 @@
             </div>
         </div>
         <div v-text="search?'＋':'－'" class="book_list_love" @click="search?AddBook(el):DelBook(el)">＋</div>
-        <div class="book_list_readed" v-if="!search">{{(el.CatalogIndex||-1)+1}}/{{el.catalog.length}}</div>
+        <div class="book_list_readed" v-if="!search">{{(el.CatalogIndex==undefined?-1:el.CatalogIndex)+1}}/{{el.catalog.length}}</div>
     </div>
 </div>
 <div class="bookCatalog" v-if="book.catalog && book.catalog.length>0">

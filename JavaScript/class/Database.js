@@ -28,7 +28,9 @@ Database.prototype = {
             let objectStore;
             Object.keys(self.$option.ObjectStore).forEach(function (key) {
                 let ObjectStore = self.$option.ObjectStore[key];
-                if (!db.objectStoreNames.contains(ObjectStore)) {
+                if (db.objectStoreNames.contains(ObjectStore.name)) {
+
+                } else {
                     objectStore = db.createObjectStore(ObjectStore.name, {
                         keyPath: ObjectStore.keyPath,
                         autoIncrement: ObjectStore.autoIncrement !== undefined ? ObjectStore.autoIncrement : true
@@ -102,7 +104,7 @@ Database.prototype = {
         if (option.index) {
             objectStore = objectStore.index(option.index);
         }
-        Cursor = objectStore.openCursor(option.key||null,option.SortType||"next");
+        Cursor = objectStore.openCursor(option.key || null, option.SortType || "next");
         Cursor.onsuccess = function (event) {
             let cursor = event.target.result;
             if (cursor) {
