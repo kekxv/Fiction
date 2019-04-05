@@ -40,8 +40,8 @@ a {
 .button,
 input:focus,
 input {
-    border: 1px solid #1B9AF7;
-    box-shadow: 0 0 5px #1B9AF7;
+    border: 1px solid #8cceff;
+    box-shadow: 0 0 5px #8cceff;
 }
 
 input:focus,
@@ -251,4 +251,15 @@ div.bookRead > .bookRead_Menu > div{
 div.bookShelf div.book_list.hasUpdate{
     box-shadow: 0 0 3px #03A9F4;
     background: #eff9ff;
+}
+
+div.BookConfig {
+    padding: 1em;
+    line-height: 3em;
+    display: flex;
+    flex-direction: column;
+}
+div.BookConfig input{
+    width: 100%;
+    padding: 5px;
 }

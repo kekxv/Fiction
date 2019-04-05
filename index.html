@@ -25,7 +25,6 @@
 
     <link rel="stylesheet" type="text/css" href="styles/inline.css?v=2019040417">
     <script src="JavaScript/API.js?v=2019040417"></script>
-    <script src="JavaScript/model/huanyue123.js?v=2019040417"></script>
 </head>
 <body>
 <div class="bookShelf">
@@ -34,7 +33,7 @@
         <form style="display: flex;" onsubmit="return false;">
             <input style="flex: 1;margin-right: 10px;" v-model="searchKeyword" placeholder="请输入要搜索的小说">
             <button type="submit" class="button button-border button-rounded" @click="searchBook()"
-                    v-text="searchKeyword.length==0?'书架':'搜索'"></button>
+                    v-text="searchKeyword.length==0?(search?'书架':'设置'):'搜索'"></button>
         </form>
     </div>
     <div class="book_list" v-if="isUpdating > 0" style="font-size: 14px;padding: 3px;text-align: center;">
