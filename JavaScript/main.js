@@ -36,6 +36,25 @@ window.onload = async function () {
         head.appendChild(script);
     }
 
+    function getUrlParam() {
+        //返回当前 URL 的查询部分（问号 ? 之后的部分）。
+        const urlParameters = location.search;
+        //声明并初始化接收请求参数的对象
+        const requestParameters = {};
+        //如果该求青中有请求的参数，则获取请求的参数，否则打印提示此请求没有请求的参数
+        if (urlParameters.indexOf('?') !== -1) {
+            //获取请求参数的字符串
+            var parameters = decodeURI(urlParameters.substr(1));
+            //将请求的参数以&分割中字符串数组
+            parameterArray = parameters.split('&');
+            //循环遍历，将请求的参数封装到请求参数的对象之中
+            for (var i = 0; i < parameterArray.length; i++) {
+                requestParameters[parameterArray[i].split('=')[0]] = (parameterArray[i].split('=')[1]);
+            }
+        }
+        return requestParameters;
+    }
+
     function CheckConfig(flag) {
         return new Promise((resolve, reject) => {
             let option = {
@@ -44,6 +63,14 @@ window.onload = async function () {
                 Model: localStorage.getItem("Model"),
             };
             if (flag || (option.ProxyUrl == null || option.Model == null || option.ModelUrl == null)) {
+                let urlParam = getUrlParam();
+                if (urlParam.ProxyUrl != null && urlParam.Model != null && urlParam.ModelUrl != null) {
+                    option = {
+                        ProxyUrl: urlParam.ProxyUrl,
+                        ModelUrl: urlParam.ModelUrl,
+                        Model: urlParam.Model,
+                    };
+                }
                 let isYes = false;
                 //页面层
                 layer.open({
@@ -55,11 +82,11 @@ window.onload = async function () {
                     , area: ['90%', 'auto']  //宽高
                     , content: `<div class="BookConfig">
                         <label>
-                            <input name="ProxyUrl" placeholder="代理地址" value="${option.ProxyUrl}" title="例如：http://localhost/ProxyCrossDomain/index.php"></label>
+                            <input name="ProxyUrl" placeholder="代理地址" value="${option.ProxyUrl || ''}" title="例如：http://localhost/ProxyCrossDomain/index.php"></label>
                         <label>
-                            <input name="ModelUrl" placeholder="插件地址" value="${option.ModelUrl}" title="例如：http://localhost/Fiction/JavaScript/model/huanyue123.js"></label>
+                            <input name="ModelUrl" placeholder="插件地址" value="${option.ModelUrl || ''}" title="例如：http://localhost/Fiction/JavaScript/model/huanyue123.js"></label>
                         <label>
-                            <input name="Model" placeholder="插件变量" value="${option.Model}" title="例如：huanyue123"></label>
+                            <input name="Model" placeholder="插件变量" value="${option.Model || ''}" title="例如：huanyue123"></label>
                         </div>`
                     , yes: function (index, layerer) {
                         isYes = true;
@@ -484,7 +511,7 @@ window.onload = async function () {
     let api;
     let option = await CheckConfig();
     loadScript(option.ModelUrl, function () {
-        api = new API(option.Model, option.ProxyUrl);
+        api = new API(Function(`return ${option.Model}`)(), option.ProxyUrl);
     });
 
 
