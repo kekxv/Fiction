@@ -1,4 +1,5 @@
 let huanyue123 = {
+    mode:"huanyue123",
     url: "http://m.huanyue123.com/",
     search: function (keyword) {
         let self = this;
@@ -24,6 +25,7 @@ let huanyue123 = {
                                 title: dom.querySelector(".title").innerText,
                                 catalog: [],
                                 CatalogIndex: -1,
+                                mode: self.mode,
                                 data: {
                                     url: bookUrl,
                                     title: dom.querySelector(".title").innerText,

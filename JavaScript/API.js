@@ -1,28 +1,47 @@
-let API = function (mode,proxyUrl) {
-    if(!!proxyUrl){
+let API = function (modes, proxyUrl) {
+    if (!!proxyUrl) {
         API.prototype.$ProxyCrossDomainUrl = proxyUrl;
     }
-    Object.defineProperty(this, "$mode", {
+    let defKey = null;
+    for (let k in modes) {
+        if (modes.hasOwnProperty(k)) {
+            defKey = k;
+            break;
+        }
+    }
+    if (defKey == null) throw new Error("参数错误");
+    Object.defineProperty(this, "$modes", {
         enumerable: false,
         configurable: false,
         get() {
-            return mode;
+            return modes;
         }
-    })
+    });
+    Object.defineProperty(this, "$defMode", {
+        enumerable: false,
+        configurable: false,
+        get() {
+            return this.$modes[defKey];
+        }
+    });
 };
 
 API.prototype = {
-    search:async function(keyword){
-        return this.$mode.search(keyword);
+    search: async function (keyword,modeKey) {
+        let mode = (modeKey && typeof modeKey === "string") ? this.$modes[modeKey] : this.$defMode;
+        return mode.search(keyword);
     },
-    catalog:async function(keyword){
-        return this.$mode.catalog(keyword);
+    catalog: async function (keyword, bookinfo) {
+        let mode = (bookinfo && typeof bookinfo.mode === "string") ? this.$modes[bookinfo.mode] : this.$defMode;
+        return mode.catalog(keyword);
     },
-    content:async function(catalog){
-        return this.$mode.content(catalog);
+    content: async function (catalog, bookinfo) {
+        let mode = (bookinfo && typeof bookinfo.mode === "string") ? this.$modes[bookinfo.mode] : this.$defMode;
+        return mode.content(catalog);
     },
-    update:async function(bookinfo){
-        return this.$mode.update(bookinfo);
+    update: async function (bookinfo) {
+        let mode = (bookinfo && typeof bookinfo.mode === "string") ? this.$modes[bookinfo.mode] : this.$defMode;
+        return mode.update(bookinfo.data);
     },
     $ProxyCrossDomainUrl: "",
     GetData: function (url, callback, err) {

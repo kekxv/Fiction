@@ -57,6 +57,7 @@ window.onload = async function () {
 
     function CheckConfig(flag) {
         return new Promise((resolve, reject) => {
+
             let option = {
                 ProxyUrl: localStorage.getItem("ProxyUrl"),
                 ModelUrl: localStorage.getItem("ModelUrl"),
@@ -118,6 +119,8 @@ window.onload = async function () {
             search: false,
             isUpdating: 0,
             list: [],
+            modeKey: null,
+            modeKeys: [],
             searchKeyword: ""
         },
         methods: {
@@ -126,7 +129,7 @@ window.onload = async function () {
                     shade: [0.2, '#FFF'] //0.1透明度的白色背景
                 });
                 if (window.navigator.onLine && !update) {
-                    book.catalog = await api.catalog(book.data.url);
+                    book.catalog = await api.catalog(book.data.url,book);
                     DB.Update({
                         StoreArray: ["books"],
                         objectStore: "books",
@@ -181,12 +184,12 @@ window.onload = async function () {
                             self.isUpdating++;
                             let item = bookShelf.list[i];
                             let time = item.data.time;
-                            api.update(item.data).then(async function (bookinfo) {
+                            api.update(item).then(async function (bookinfo) {
                                 try {
                                     let isUpdate = (!item.catalog || item.catalog.length === 0) || time.trim() !== bookinfo.time.trim();
                                     if (isUpdate) {
                                         item.data = bookinfo;
-                                        item.catalog = await api.catalog(bookinfo.url);
+                                        item.catalog = await api.catalog(bookinfo.url,item);
                                         layer.msg(`《${bookinfo.title}》有更新。。`, {icon: 1});
                                         DB.Update({
                                             StoreArray: ["books"],
@@ -255,7 +258,7 @@ window.onload = async function () {
                         let d = {
                             CatalogUrl: bookinfo.catalog[bookinfo.CatalogIndex + i].url,
                             title: bookinfo.title,
-                            content: await api.content(bookinfo.catalog[bookinfo.CatalogIndex + i]),
+                            content: await api.content(bookinfo.catalog[bookinfo.CatalogIndex + i],bookinfo),
                             CatalogIndex: bookinfo.CatalogIndex + i
                         };
                         DB.Update({
@@ -286,7 +289,7 @@ window.onload = async function () {
                     shade: [0.2, '#FFF'] //0.1透明度的白色背景
                 });
                 this.search = true;
-                this.list = await api.search(this.searchKeyword);
+                this.list = await api.search(this.searchKeyword,this.modeKey);
                 this.searchKeyword = "";
                 layer.close(index);
             },
@@ -465,7 +468,7 @@ window.onload = async function () {
                         let d = {
                             CatalogUrl: this.book.catalog[newVal].url,
                             title: this.book.title,
-                            content: await api.content(this.book.catalog[newVal]),
+                            content: await api.content(this.book.catalog[newVal],this.book),
                             CatalogIndex: newVal
                         };
                         this.content = d.content;
@@ -511,7 +514,9 @@ window.onload = async function () {
     let api;
     let option = await CheckConfig();
     loadScript(option.ModelUrl, function () {
-        api = new API(Function(`return ${option.Model}`)(), option.ProxyUrl);
+        let models = {};
+        models[option.Model] = Function(`return ${option.Model}`)();
+        api = new API(models, option.ProxyUrl);
     });
 
 
