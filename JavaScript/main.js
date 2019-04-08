@@ -55,6 +55,8 @@ window.onload = async function () {
         return requestParameters;
     }
 
+    let urlParam = getUrlParam();
+
     function CheckConfig(flag) {
         return new Promise((resolve, reject) => {
 
@@ -64,13 +66,13 @@ window.onload = async function () {
                 Model: localStorage.getItem("Model"),
             };
             if (flag || (option.ProxyUrl == null || option.Model == null || option.ModelUrl == null)) {
-                let urlParam = getUrlParam();
                 if (urlParam.ProxyUrl != null && urlParam.Model != null && urlParam.ModelUrl != null) {
                     option = {
                         ProxyUrl: urlParam.ProxyUrl,
                         ModelUrl: urlParam.ModelUrl,
                         Model: urlParam.Model,
                     };
+                    history.replaceState(urlParam, document.title, `${location.origin}${location.pathname}`);
                 }
                 let isYes = false;
                 //页面层
@@ -129,7 +131,7 @@ window.onload = async function () {
                     shade: [0.2, '#FFF'] //0.1透明度的白色背景
                 });
                 if (window.navigator.onLine && !update) {
-                    book.catalog = await api.catalog(book.data.url,book);
+                    book.catalog = await api.catalog(book.data.url, book);
                     DB.Update({
                         StoreArray: ["books"],
                         objectStore: "books",
@@ -189,7 +191,7 @@ window.onload = async function () {
                                     let isUpdate = (!item.catalog || item.catalog.length === 0) || time.trim() !== bookinfo.time.trim();
                                     if (isUpdate) {
                                         item.data = bookinfo;
-                                        item.catalog = await api.catalog(bookinfo.url,item);
+                                        item.catalog = await api.catalog(bookinfo.url, item);
                                         layer.msg(`《${bookinfo.title}》有更新。。`, {icon: 1});
                                         DB.Update({
                                             StoreArray: ["books"],
@@ -258,7 +260,7 @@ window.onload = async function () {
                         let d = {
                             CatalogUrl: bookinfo.catalog[bookinfo.CatalogIndex + i].url,
                             title: bookinfo.title,
-                            content: await api.content(bookinfo.catalog[bookinfo.CatalogIndex + i],bookinfo),
+                            content: await api.content(bookinfo.catalog[bookinfo.CatalogIndex + i], bookinfo),
                             CatalogIndex: bookinfo.CatalogIndex + i
                         };
                         DB.Update({
@@ -289,7 +291,7 @@ window.onload = async function () {
                     shade: [0.2, '#FFF'] //0.1透明度的白色背景
                 });
                 this.search = true;
-                this.list = await api.search(this.searchKeyword,this.modeKey);
+                this.list = await api.search(this.searchKeyword, this.modeKey);
                 this.searchKeyword = "";
                 layer.close(index);
             },
@@ -468,7 +470,7 @@ window.onload = async function () {
                         let d = {
                             CatalogUrl: this.book.catalog[newVal].url,
                             title: this.book.title,
-                            content: await api.content(this.book.catalog[newVal],this.book),
+                            content: await api.content(this.book.catalog[newVal], this.book),
                             CatalogIndex: newVal
                         };
                         this.content = d.content;
@@ -557,6 +559,8 @@ window.onload = async function () {
         }
         if (bookCatalog.book.catalog && bookCatalog.book.catalog.length > 0) {
             bookCatalog.book = {};
+            if (bookShelf.search)
+                history.pushState({}, null, location.href);
             return;
         }
         console.log(event);
