@@ -98,8 +98,12 @@ let huanyue123 = {
                     box.innerHTML = data.Result;
                     documentFragment.appendChild(box);
                     let chaptercontent = box.querySelector("#chaptercontent");
-                    chaptercontent.removeChild(chaptercontent.querySelector("div"));
-                    chaptercontent.removeChild(chaptercontent.querySelector("p"));
+                    try{
+                      chaptercontent.removeChild(chaptercontent.querySelector("div"));
+                      chaptercontent.removeChild(chaptercontent.querySelector("p"));
+                    }catch(e){
+                      
+                    }
                     let da = chaptercontent.innerHTML;
                     resolve(da);
                 } else {
