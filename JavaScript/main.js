@@ -603,18 +603,18 @@ window.onload = async function () {
                         //页面层
                         layer.open({
                             type: 1
-                            , title: '初始化配置'
+                            , title: '添加新源'
                             , skin: 'layui-layer-lan'
                             , anim: 5 //动画类型
                             , btn: ['确定']
                             , area: ['90%', 'auto']  //宽高
                             , content: `<div class="BookConfig">
                         <label>
-                        <input name="ProxyUrl" placeholder="代理地址" title="例如：http://localhost/ProxyCrossDomain/index.php"></label>
+                        <input name="ProxyUrl" placeholder="代理地址" value="${urlParam.ProxyUrl}" title="例如：http://localhost/ProxyCrossDomain/index.php"></label>
                         <label>
-                        <input name="ModelUrl" placeholder="插件地址" title="例如：http://localhost/Fiction/JavaScript/model/huanyue123.js"></label>
+                        <input name="ModelUrl" placeholder="插件地址" value="${urlParam.ModelUrl}" title="例如：http://localhost/Fiction/JavaScript/model/huanyue123.js"></label>
                         <label>
-                        <input name="Model" placeholder="插件变量" title="例如：huanyue123"></label>
+                        <input name="Model" placeholder="插件变量" value="${urlParam.Model}" title="例如：huanyue123"></label>
                         </div>`
                             , yes: function (index, layerer) {
                                 isYes = true;
@@ -649,6 +649,67 @@ window.onload = async function () {
                         },
                         error: function (e) {
                             layer.msg('添加书源失败。。', {icon: 2});
+                        }
+                    });
+
+                    // await UpdateModels();
+                } catch (e) {
+                    // console.log(e);
+                }
+            },
+            putSources: async function (item) {
+                let isYes = false;
+                try {
+                    let option = await new Promise((resolve, reject) => {
+                        //页面层
+                        layer.open({
+                            type: 1
+                            , title: '修改书源'
+                            , skin: 'layui-layer-lan'
+                            , anim: 5 //动画类型
+                            , btn: ['确定']
+                            , area: ['90%', 'auto']  //宽高
+                            , content: `<div class="BookConfig">
+                        <label>
+                        <input name="ProxyUrl" placeholder="代理地址" value="${item.ProxyUrl}"></label>
+                        <label>
+                        <input name="ModelUrl" placeholder="插件地址" value="${item.ModelUrl}"></label>
+                        <label>
+                        <input name="Model" placeholder="插件变量" disabled readonly value="${item.Model}"></label>
+                        </div>`
+                            , yes: function (index, layerer) {
+                                isYes = true;
+                                layer.close(index);
+                                let option = {
+                                    ProxyUrl: layerer[0].querySelector("input[name='ProxyUrl'").value,
+                                    ModelUrl: layerer[0].querySelector("input[name='ModelUrl'").value,
+                                    Model: layerer[0].querySelector("input[name='Model'").value,
+                                };
+                                if (!option.ProxyUrl || !option.ModelUrl || !option.Model) {
+                                    isYes = false;
+                                    return;
+                                }
+                                resolve(option);
+                            }
+                            , end: function () {
+                                if (!isYes) {
+                                    reject();
+                                }
+                            }
+                        });
+                    });
+
+                    DB.Update({
+                        StoreArray: ["booksSource"],
+                        objectStore: "booksSource",
+                        data: option,
+                        success: function (e) {
+                            layer.msg('更新书源成功。。', {icon: 1}, function () {
+                                location.reload();
+                            });
+                        },
+                        error: function (e) {
+                            layer.msg('更新书源成功。。', {icon: 2});
                         }
                     });
 

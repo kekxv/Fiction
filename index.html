@@ -70,7 +70,8 @@
     <div class="book_list" style="text-align: center;" @click="addSource">添加书源</div>
     <div class="book_list" v-for="item in booksSources" style="display: flex;">
         <p style="flex:1;padding: 5px;"><span v-text="item.Model"></span></p>
-        <p class="miniButton" @click="delSources(item);">删除</p>
+        <p class="miniButton" @click="delSources(item);">删除</p>&nbsp;
+        <p class="miniButton" @click="putSources(item);">修改</p>
     </div>
 </div>
 <div class="bookCatalog" v-if="book.catalog && book.catalog.length>0">

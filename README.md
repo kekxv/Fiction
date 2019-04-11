@@ -48,4 +48,10 @@ PHP 跨域代理
 
 ## Demo 
 
-![测试网站](images/demo.png)
+> 书源 ： huanyue123
+> 
+> ![测试网站](images/Qr_huanyue123.png)
+
+> 书源 ： biquguan
+>
+> ![测试网站](images/Qr_biquguan.png)
