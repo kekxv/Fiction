@@ -1,12 +1,12 @@
-if (!window.huanyue123)
-    window.huanyue123 = {
-        mode: "huanyue123",
-        url: "http://m.huanyue123.com/",
+if (!window.biquguan)
+    window.biquguan = {
+        mode: "biquguan",
+        url: "https://m.biquguan.com",
         ProxyUrl: "http://127.0.0.1/ProxyCrossDomain/",
         search: function (keyword) {
             let self = this;
             return new Promise((resolve, reject) => {
-                API.PutData(self.url + "s.php", JSON.stringify({"keyword": keyword, "t": 1}), function (data) {
+                API.GetData(`${self.url}/SearchBook.php?q=${keyword}`, function (data) {
                     if (data.Code === 0) {
                         let documentFragment = document.createDocumentFragment();
                         let box = document.createElement("div");
@@ -24,20 +24,16 @@ if (!window.huanyue123)
                                 let bookUrl = dom.querySelector("a").getAttribute("href");
                                 let _bookUrl = bookUrl.replace(/^\/?([^\/]*)\/?$/g, "$1");
                                 da.push({
-                                    title: dom.querySelector(".title").innerText,
+                                    title: dom.querySelector(".title").innerText.replace(/\n/g, ''),
                                     catalog: [],
                                     CatalogIndex: -1,
                                     mode: self.mode,
                                     data: {
                                         url: bookUrl,
-                                        title: dom.querySelector(".title").innerText,
-                                        author: _[0].innerText,
-                                        state: _[1].innerText,
-                                        image: "{url}/files/article/image/{bookUrl}/{id}s.jpg".format({
-                                            url: self.url.replace("m.", "www."),
-                                            bookUrl: _bookUrl.split("_").join("/"),
-                                            id: _bookUrl.split("_").pop()
-                                        }),
+                                        title: dom.querySelector(".title").innerText.replace(/\n/g, ''),
+                                        author: _[0].innerText.replace(/\n/g, ''),
+                                        state: _[1].innerText.replace(/\n/g, ''),
+                                        image: "",
                                     }
                                 });
                             }
@@ -131,10 +127,11 @@ if (!window.huanyue123)
                         documentFragment.appendChild(box);
                         let synopsisArea_detail = box.querySelector(".synopsisArea_detail");
                         try {
-                            book.state = synopsisArea_detail.querySelector("p.upchapter").innerText.trim();
-                            book.time = synopsisArea_detail.querySelectorAll("p")[3].innerText.trim();
+                            book.image = synopsisArea_detail.querySelector("img1").getAttribute("src");
+                            book.state = synopsisArea_detail.querySelectorAll("p")[4].innerText.replace(/\n/g, '').trim();
+                            book.time = synopsisArea_detail.querySelectorAll("p")[3].innerText.replace(/\n/g, '').trim();
                         } catch (e) {
-
+                            console.log(e);
                         }
                         resolve(book);
                     } else {

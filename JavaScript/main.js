@@ -1,4 +1,61 @@
 window.onload = async function () {
+    let api = null;
+
+    let DB = new Database({
+        DB: "book"
+        , version: 3
+        , ObjectStore: [
+            {
+                name: "books", keyPath: "title", Index: [
+                    {name: "title", key: "title", unique: true}
+                    , {name: "data", key: "data", unique: false}
+                    , {name: "catalog", key: "catalog", unique: false}
+                    , {name: "CatalogIndex", key: "CatalogIndex", unique: false}
+                ]
+            },
+            {
+                name: "booksCache", keyPath: "CatalogUrl", Index: [
+                    {name: "CatalogUrl", key: "CatalogUrl", unique: true}
+                    , {name: "title", key: "title", unique: false}
+                    , {name: "content", key: "content", unique: false}
+                    , {name: "CatalogIndex", key: "CatalogIndex", unique: false}
+                ]
+            },
+            {
+                name: "booksSource", keyPath: "ModelUrl", Index: [
+                    {name: "ModelUrl", key: "ModelUrl", unique: true}
+                    , {name: "Model", key: "Model", unique: true}
+                    , {name: "ProxyUrl", key: "ProxyUrl", unique: false}
+                ]
+            },
+        ],
+        onupgradeneeded: function (db) {
+            let self = this;
+            self.ready = function () {
+                self.Add({
+                    StoreArray: ["booksSource"],
+                    objectStore: "booksSource",
+                    data: {
+                        ModelUrl: "http://127.0.0.1/Fiction/JavaScript/model/huanyue123.js",
+                        Model: "huanyue123",
+                        ProxyUrl: "http://127.0.0.1/ProxyCrossDomain/",
+                    },
+                    success: function (e) {
+                        layer.msg('添加书源成功。。', {icon: 1});
+                    },
+                    error: function (e) {
+                        layer.msg('添加书源失败。。', {icon: 2});
+                    }
+                });
+            }
+        }
+    });
+
+    await new Promise((resolve, reject) => {
+        DB.ready = function () {
+            resolve();
+        }
+    });
 
     /**
      * 获取坐标
@@ -55,65 +112,49 @@ window.onload = async function () {
         return requestParameters;
     }
 
-    let urlParam = getUrlParam();
-
-    function CheckConfig(flag) {
-        return new Promise((resolve, reject) => {
-
-            let option = {
-                ProxyUrl: localStorage.getItem("ProxyUrl"),
-                ModelUrl: localStorage.getItem("ModelUrl"),
-                Model: localStorage.getItem("Model"),
-            };
-            if (flag || (option.ProxyUrl == null || option.Model == null || option.ModelUrl == null)) {
-                if (urlParam.ProxyUrl != null && urlParam.Model != null && urlParam.ModelUrl != null) {
-                    option = {
-                        ProxyUrl: urlParam.ProxyUrl,
-                        ModelUrl: urlParam.ModelUrl,
-                        Model: urlParam.Model,
-                    };
-                    history.replaceState(urlParam, document.title, `${location.origin}${location.pathname}`);
-                }
-                let isYes = false;
-                //页面层
-                layer.open({
-                    type: 1
-                    , title: '初始化配置'
-                    , skin: 'layui-layer-lan'
-                    , anim: 5 //动画类型
-                    , btn: ['确定']
-                    , area: ['90%', 'auto']  //宽高
-                    , content: `<div class="BookConfig">
-                        <label>
-                            <input name="ProxyUrl" placeholder="代理地址" value="${option.ProxyUrl || ''}" title="例如：http://localhost/ProxyCrossDomain/index.php"></label>
-                        <label>
-                            <input name="ModelUrl" placeholder="插件地址" value="${option.ModelUrl || ''}" title="例如：http://localhost/Fiction/JavaScript/model/huanyue123.js"></label>
-                        <label>
-                            <input name="Model" placeholder="插件变量" value="${option.Model || ''}" title="例如：huanyue123"></label>
-                        </div>`
-                    , yes: function (index, layerer) {
-                        isYes = true;
-                        layer.close(index);
-                        option = {
-                            ProxyUrl: layerer[0].querySelector("input[name='ProxyUrl'").value,
-                            ModelUrl: layerer[0].querySelector("input[name='ModelUrl'").value,
-                            Model: layerer[0].querySelector("input[name='Model'").value,
-                        };
-                        localStorage.setItem("ProxyUrl", option.ProxyUrl);
-                        localStorage.setItem("ModelUrl", option.ModelUrl);
-                        localStorage.setItem("Model", option.Model);
-                        resolve(option);
+    async function UpdateModels() {
+        let options = await new Promise((resolve, reject) => {
+            let da = [];
+            DB.ReadAll({
+                StoreArray: ["booksSource"],
+                objectStore: "booksSource",
+                success: function (cursor, value) {
+                    if (cursor) {
+                        da.push(value)
+                    } else {
+                        resolve(da);
                     }
-                    , end: function () {
-                        if (!isYes) resolve(option);
+                    return true;
+                }
+            });
+        });
+        bookConfig.booksSources = options;
+        let models = {};
+        await new Promise((resolve, reject) => {
+            let len = options.length;
+            for (let i = 0; i < options.length; i++) {
+                if (!options.hasOwnProperty(i)) continue;
+                let option = options[i];
+                loadScript(option.ModelUrl, function () {
+                    models[option.Model] = Function(`return ${option.Model}`)();
+                    models[option.Model].ProxyUrl = option.ProxyUrl || models[option.Model].ProxyUrl;
+                    len--;
+                    if (len === 0) {
+                        resolve();
                     }
                 });
-                return;
             }
-            resolve(option);
-
         });
+        if (api === null) {
+            api = new API(models);
+        } else {
+            api.$modes = models;
+        }
+        return models;
     }
+
+
+    let urlParam = getUrlParam();
 
     let bookShelf = new Vue({
         el: ".bookShelf",
@@ -121,8 +162,8 @@ window.onload = async function () {
             search: false,
             isUpdating: 0,
             list: [],
-            modeKey: null,
-            modeKeys: [],
+            booksSource: [],
+            modeKey: "",
             searchKeyword: ""
         },
         methods: {
@@ -257,21 +298,25 @@ window.onload = async function () {
                 });
                 for (let i = _da.length; i < 4; i++) {
                     if (bookinfo.catalog && bookinfo.catalog.length > bookinfo.CatalogIndex + i) {
-                        let d = {
-                            CatalogUrl: bookinfo.catalog[bookinfo.CatalogIndex + i].url,
-                            title: bookinfo.title,
-                            content: await api.content(bookinfo.catalog[bookinfo.CatalogIndex + i], bookinfo),
-                            CatalogIndex: bookinfo.CatalogIndex + i
-                        };
-                        DB.Update({
-                            StoreArray: ["booksCache"],
-                            objectStore: "booksCache",
-                            data: d,
-                            success: function (e) {
-                            },
-                            error: function (e) {
-                            }
-                        });
+                        try {
+                            let d = {
+                                CatalogUrl: bookinfo.catalog[bookinfo.CatalogIndex + i].url,
+                                title: bookinfo.title,
+                                content: await api.content(bookinfo.catalog[bookinfo.CatalogIndex + i], bookinfo),
+                                CatalogIndex: bookinfo.CatalogIndex + i
+                            };
+                            DB.Update({
+                                StoreArray: ["booksCache"],
+                                objectStore: "booksCache",
+                                data: d,
+                                success: function (e) {
+                                },
+                                error: function (e) {
+                                }
+                            });
+                        } catch (e) {
+                            console.log(e);
+                        }
                     } else {
                         break;
                     }
@@ -283,7 +328,7 @@ window.onload = async function () {
                     if (this.search) {
                         this.UpdateData();
                     } else {
-                        CheckConfig(true);
+                        bookConfig.isAlive = true;
                     }
                     return;
                 }
@@ -291,8 +336,12 @@ window.onload = async function () {
                     shade: [0.2, '#FFF'] //0.1透明度的白色背景
                 });
                 this.search = true;
-                this.list = await api.search(this.searchKeyword, this.modeKey);
-                this.searchKeyword = "";
+                try {
+                    this.list = await api.search(this.searchKeyword, this.modeKey);
+                } catch (e) {
+                    layer.msg("搜索失败");
+                }
+                // this.searchKeyword = "";
                 layer.close(index);
             },
             AddBook: function (data) {
@@ -322,6 +371,31 @@ window.onload = async function () {
                 });
             },
 
+        },
+        watch: {
+            search: function (newVal, oldVal) {
+                if (newVal) {
+                    if (!history.state) {
+                        history.pushState({}, null, location.href);
+                    }
+                } else {
+                    this.UpdateData();
+                    this.searchKeyword = "";
+                }
+            },
+            booksSource: function (newVal, oldVal) {
+                for (let i in newVal) {
+                    if (newVal.hasOwnProperty(i)) {
+                        this.modeKey = i;
+                        break;
+                    }
+                }
+            },
+            modeKey: function (newVal, oldVal) {
+                if (this.search && !newVal) {
+                    console.log(newVal);
+                }
+            }
         }
     });
     let bookCatalog = new Vue({
@@ -395,7 +469,6 @@ window.onload = async function () {
                     }
                         break;
                     case 7:
-                        break;
                     case 8: {
                         let top = dom.scrollTop;
                         dom.scrollTop += h - 18;
@@ -512,58 +585,117 @@ window.onload = async function () {
         }
     });
 
+    let bookConfig = new Vue({
+        el: ".bookConfig",
+        data: {
+            isAlive: false,
+            booksSources: [],
+        },
+        methods: {
+            delSources: function (item) {
+                // console.log(item);
+                layer.msg("暂不支持删除");
+            },
+            addSource: async function () {
+                let isYes = false;
+                try {
+                    let option = await new Promise((resolve, reject) => {
+                        //页面层
+                        layer.open({
+                            type: 1
+                            , title: '初始化配置'
+                            , skin: 'layui-layer-lan'
+                            , anim: 5 //动画类型
+                            , btn: ['确定']
+                            , area: ['90%', 'auto']  //宽高
+                            , content: `<div class="BookConfig">
+                        <label>
+                        <input name="ProxyUrl" placeholder="代理地址" title="例如：http://localhost/ProxyCrossDomain/index.php"></label>
+                        <label>
+                        <input name="ModelUrl" placeholder="插件地址" title="例如：http://localhost/Fiction/JavaScript/model/huanyue123.js"></label>
+                        <label>
+                        <input name="Model" placeholder="插件变量" title="例如：huanyue123"></label>
+                        </div>`
+                            , yes: function (index, layerer) {
+                                isYes = true;
+                                layer.close(index);
+                                let option = {
+                                    ProxyUrl: layerer[0].querySelector("input[name='ProxyUrl'").value,
+                                    ModelUrl: layerer[0].querySelector("input[name='ModelUrl'").value,
+                                    Model: layerer[0].querySelector("input[name='Model'").value,
+                                };
+                                if (!option.ProxyUrl || !option.ModelUrl || !option.Model) {
+                                    isYes = false;
+                                    return;
+                                }
+                                resolve(option);
+                            }
+                            , end: function () {
+                                if (!isYes) {
+                                    reject();
+                                }
+                            }
+                        });
+                    });
 
-    let api;
-    let option = await CheckConfig();
-    loadScript(option.ModelUrl, function () {
-        let models = {};
-        models[option.Model] = Function(`return ${option.Model}`)();
-        api = new API(models, option.ProxyUrl);
+                    DB.Add({
+                        StoreArray: ["booksSource"],
+                        objectStore: "booksSource",
+                        data: option,
+                        success: function (e) {
+                            layer.msg('添加书源成功。。', {icon: 1}, function () {
+                                location.reload();
+                            });
+                        },
+                        error: function (e) {
+                            layer.msg('添加书源失败。。', {icon: 2});
+                        }
+                    });
+
+                    // await UpdateModels();
+                } catch (e) {
+                    // console.log(e);
+                }
+            }
+        },
+        watch: {
+            isAlive: function (newVal, oldVal) {
+                if (newVal) {
+                    if (!history.state) {
+                        history.pushState({}, null, location.href);
+                    }
+                }
+            }
+        }
     });
 
+    window.bookShelf = bookShelf;
+    window.bookCatalog = bookCatalog;
+    window.bookRead = bookRead;
+    window.bookConfig = bookConfig;
 
-    let DB = new Database({
-        DB: "book"
-        , version: 2
-        , ObjectStore: [
-            {
-                name: "books", keyPath: "title", Index: [
-                    {name: "title", key: "title", unique: true}
-                    , {name: "data", key: "data", unique: false}
-                    , {name: "catalog", key: "catalog", unique: false}
-                    , {name: "CatalogIndex", key: "CatalogIndex", unique: false}
-                ]
-            },
-            {
-                name: "booksCache", keyPath: "CatalogUrl", Index: [
-                    {name: "CatalogUrl", key: "CatalogUrl", unique: true}
-                    , {name: "title", key: "title", unique: false}
-                    , {name: "content", key: "content", unique: false}
-                    , {name: "CatalogIndex", key: "CatalogIndex", unique: false}
-                ]
-            },
-        ]
-    });
-    DB.ready = function () {
+    DB.ready = async function () {
+        bookShelf.booksSource = await UpdateModels();
         bookShelf.UpdateData();
     };
 
-//拦截安卓回退按钮
-// history.pushState(null, null, location.href);
+    //拦截安卓回退按钮
+    // history.pushState(null, null, location.href);
     window.addEventListener('popstate', function (event) {
-        if (bookRead.CatalogIndex !== -1) {
+        if (!history.state && bookRead.CatalogIndex !== -1) {
             bookRead.CatalogIndex = -1;
             if (bookCatalog.book.catalog && bookCatalog.book.catalog.length > 0)
                 history.pushState({}, null, location.href);
             return;
         }
-        if (bookCatalog.book.catalog && bookCatalog.book.catalog.length > 0) {
+        if (!history.state && bookCatalog.book.catalog && bookCatalog.book.catalog.length > 0) {
             bookCatalog.book = {};
             if (bookShelf.search)
                 history.pushState({}, null, location.href);
             return;
         }
-        console.log(event);
+        bookShelf.search = false;
+        // console.log(event);
     });
 
 };

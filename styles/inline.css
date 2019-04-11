@@ -38,12 +38,16 @@ a {
 }
 
 .button,
+select:focus,
+select,
 input:focus,
 input {
     border: 1px solid #8cceff;
     box-shadow: 0 0 5px #8cceff;
 }
 
+select,
+select:focus,
 input:focus,
 input {
     padding: 1px;
@@ -91,6 +95,7 @@ div.bookRead {
 
 div.bookCatalog,
 div.bookShelf,
+div.bookConfig,
 div.bookRead {
     position: fixed;
     top: 0;
@@ -98,13 +103,16 @@ div.bookRead {
     right: 0;
     left: 0;
 }
+div.bookConfig{
+    background: white;
+}
 
 div.bookShelf {
     background: #f3f3f3;
     overflow: auto;
 }
 
-div.bookShelf div.book_list {
+div.book_list {
     margin: 6px;
     padding: 10px;
     background: #FFFFFF;
@@ -115,21 +123,21 @@ div.bookShelf div.book_list {
 
 }
 
-div.bookShelf div.book_list > div {
+div.book_list > div {
     display: flex;
 }
 
-div.bookShelf div.book_list img {
+div.book_list img {
     width: 90px;
     height: 128px;
 }
 
-div.bookShelf div.book_list > div > div {
+div.book_list > div > div {
     padding: 5px;
     height: 135px;
 }
 
-div.bookShelf div.book_list div.book_list_readed {
+div.book_list div.book_list_readed {
     position: absolute;
     bottom: 1px;
     right: 1px;
@@ -137,7 +145,7 @@ div.bookShelf div.book_list div.book_list_readed {
     background: #dccbab;
     padding: 0 10px;
 }
-div.bookShelf div.book_list div.book_list_love {
+div.book_list div.book_list_love {
     position: absolute;
     right: 5px;
     width: 1.5em;
@@ -152,7 +160,7 @@ div.bookShelf div.book_list div.book_list_love {
     padding: 0.15em;
 }
 
-div.bookShelf div.book_list > div > div > div {
+div.book_list > div > div > div {
     overflow: hidden; /*自动隐藏文字*/
     text-overflow: ellipsis; /*文字隐藏后添加省略号*/
 }
@@ -248,7 +256,7 @@ div.bookRead > .bookRead_Menu > div{
     font-weight: bold;
 }
 
-div.bookShelf div.book_list.hasUpdate{
+div.book_list.hasUpdate{
     box-shadow: 0 0 3px #03A9F4;
     background: #eff9ff;
 }
@@ -259,7 +267,17 @@ div.BookConfig {
     display: flex;
     flex-direction: column;
 }
+div.BookConfig select,
 div.BookConfig input{
     width: 100%;
     padding: 5px;
+}
+
+
+.miniButton{
+    padding: 3px 5px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 3px;
+    text-align: center;
+    background: rgba(27, 154, 247, 0.08);
 }

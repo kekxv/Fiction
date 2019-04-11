@@ -31,18 +31,23 @@
 
     <div class="book_list">
         <form style="display: flex;" onsubmit="return false;">
-            <input style="flex: 1;margin-right: 10px;" v-model="searchKeyword" placeholder="请输入要搜索的小说">
+            <input style="min-width:1em;flex: 1;margin-right: 10px;" v-model="searchKeyword" placeholder="请输入要搜索的小说">
             <button type="submit" class="button button-border button-rounded" @click="searchBook()"
                     v-text="searchKeyword.length==0?(search?'书架':'设置'):'搜索'"></button>
         </form>
+        <select v-model="modeKey" v-if="search || searchKeyword.length>0"
+                style="padding:10px 2px;margin-right: 5px;width: 100%;margin-top: 10px;background: white;">
+            <option v-for="item in booksSource" :value="item.mode" v-text="item.mode"></option>
+        </select>
     </div>
     <div class="book_list" v-if="isUpdating > 0" style="font-size: 14px;padding: 3px;text-align: center;">
         正在更新
     </div>
-    <div class="book_list" v-for="el in list" :class="{'hasUpdate':(el.CatalogIndex==undefined?-1:el.CatalogIndex)+1< el.catalog.length}">
+    <div class="book_list" v-for="el in list"
+         :class="{'hasUpdate':(el.CatalogIndex==undefined?-1:el.CatalogIndex)+1< el.catalog.length}">
         <div @click="search?showCatalog(el):ReadBook(el)">
             <div>
-                <img :src="el.data.image"/>
+                <img :src="el.data.image || './images/defaultCover.svg'"/>
             </div>
             <div>
                 <div><span>{{el.title}}</span></div>
@@ -52,7 +57,20 @@
             </div>
         </div>
         <div v-text="search?'＋':'－'" class="book_list_love" @click="search?AddBook(el):DelBook(el)">＋</div>
-        <div class="book_list_readed" v-if="!search">{{(el.CatalogIndex==undefined?-1:el.CatalogIndex)+1}}/{{el.catalog.length}}</div>
+        <div class="book_list_readed" v-if="!search">
+            {{(el.CatalogIndex==undefined?-1:el.CatalogIndex)+1}}/{{el.catalog.length}}
+        </div>
+    </div>
+</div>
+<div class="bookConfig" v-if="isAlive">
+    <div class="book_list">
+        <h3>书源管理</h3>
+    </div>
+
+    <div class="book_list" style="text-align: center;" @click="addSource">添加书源</div>
+    <div class="book_list" v-for="item in booksSources" style="display: flex;">
+        <p style="flex:1;padding: 5px;"><span v-text="item.Model"></span></p>
+        <p class="miniButton" @click="delSources(item);">删除</p>
     </div>
 </div>
 <div class="bookCatalog" v-if="book.catalog && book.catalog.length>0">

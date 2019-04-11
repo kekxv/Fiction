@@ -1,7 +1,4 @@
-let API = function (modes, proxyUrl) {
-    if (!!proxyUrl) {
-        API.prototype.$ProxyCrossDomainUrl = proxyUrl;
-    }
+let API = function (modes) {
     let defKey = null;
     for (let k in modes) {
         if (modes.hasOwnProperty(k)) {
@@ -15,6 +12,9 @@ let API = function (modes, proxyUrl) {
         configurable: false,
         get() {
             return modes;
+        },
+        set(v) {
+            modes = v;
         }
     });
     Object.defineProperty(this, "$defMode", {
@@ -29,26 +29,35 @@ let API = function (modes, proxyUrl) {
 API.prototype = {
     search: async function (keyword,modeKey) {
         let mode = (modeKey && typeof modeKey === "string") ? this.$modes[modeKey] : this.$defMode;
+        if (!!mode.ProxyUrl) {
+            API.prototype.$ProxyCrossDomainUrl = mode.ProxyUrl;
+        }
         return mode.search(keyword);
     },
     catalog: async function (keyword, bookinfo) {
         let mode = (bookinfo && typeof bookinfo.mode === "string") ? this.$modes[bookinfo.mode] : this.$defMode;
+        if (!!mode.ProxyUrl) {
+            API.prototype.$ProxyCrossDomainUrl = mode.ProxyUrl;
+        }
         return mode.catalog(keyword);
     },
     content: async function (catalog, bookinfo) {
         let mode = (bookinfo && typeof bookinfo.mode === "string") ? this.$modes[bookinfo.mode] : this.$defMode;
+        if (!!mode.ProxyUrl) {
+            API.prototype.$ProxyCrossDomainUrl = mode.ProxyUrl;
+        }
         return mode.content(catalog);
     },
     update: async function (bookinfo) {
         let mode = (bookinfo && typeof bookinfo.mode === "string") ? this.$modes[bookinfo.mode] : this.$defMode;
+        if (!!mode.ProxyUrl) {
+            API.prototype.$ProxyCrossDomainUrl = mode.ProxyUrl;
+        }
         return mode.update(bookinfo.data);
     },
     $ProxyCrossDomainUrl: "",
     GetData: function (url, callback, err) {
         let headers = {};
-        if (self.Token > 0) {
-            // headers['Cookie'] = 'ess-token={Token}; '.format({Token: self.Token});
-        }
         fetch("{0}?url={1}".format(API.prototype.$ProxyCrossDomainUrl, encodeURIComponent(url)),
             {
                 cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
@@ -65,13 +74,9 @@ API.prototype = {
             }).then(callback || console.log).catch(err || console.log).catch(err || console.log)
     },
     PutData: function (url, data, callback, err) {
-        let self = this;
         let headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
         };
-        if (self.Token > 0) {
-            // headers['Cookie'] = 'ess-token={Token}; '.format({Token: self.Token});
-        }
         if (typeof data === "object") {
             let s = "";
             for (let i in data) {
@@ -98,13 +103,9 @@ API.prototype = {
             }).then(callback || console.log).catch(err || console.log).catch(err || console.log)
     },
     PutJson: function (url, data, callback, err) {
-        let self = this;
         let headers = {
             'Content-Type': 'application/json',
         };
-        if (self.Token > 0) {
-            // headers['Cookie'] = 'ess-token={Token}; '.format({Token: self.Token});
-        }
         fetch("{0}?url={1}".format(API.prototype.$ProxyCrossDomainUrl, encodeURIComponent(url)),
             {
                 body: JSON.stringify({

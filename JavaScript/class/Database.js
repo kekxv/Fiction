@@ -47,10 +47,11 @@ Database.prototype = {
         };
         request.onsuccess = function (e) {
             let db = e.target.result;
-            Database.defineProperty(self, "$DB", db);
+            if (this.$DB === undefined)
+                Database.defineProperty(self, "$DB", db);
 
             while (self.$ready.length > 0) {
-                self.$ready.pop()(self);
+                self.$ready.pop().call(self);
             }
         };
         request.onerror = function (e) {
