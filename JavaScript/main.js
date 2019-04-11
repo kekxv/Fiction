@@ -31,23 +31,6 @@ window.onload = async function () {
         ],
         onupgradeneeded: function (db) {
             let self = this;
-            self.ready = function () {
-                self.Add({
-                    StoreArray: ["booksSource"],
-                    objectStore: "booksSource",
-                    data: {
-                        ModelUrl: "http://127.0.0.1/Fiction/JavaScript/model/huanyue123.js",
-                        Model: "huanyue123",
-                        ProxyUrl: "http://127.0.0.1/ProxyCrossDomain/",
-                    },
-                    success: function (e) {
-                        layer.msg('添加书源成功。。', {icon: 1});
-                    },
-                    error: function (e) {
-                        layer.msg('添加书源失败。。', {icon: 2});
-                    }
-                });
-            }
         }
     });
 
