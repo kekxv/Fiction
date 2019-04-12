@@ -461,8 +461,9 @@ window.onload = async function () {
                     case 5:
                         break;
                     case 6: {
+                        let flag = dom.scrollTop === 0;
                         dom.scrollTop -= h + 18;
-                        if (dom.scrollTop === 0) {
+                        if (flag && dom.scrollTop === 0) {
                             this.menu(0);
                         }
                     }
