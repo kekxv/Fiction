@@ -1,3 +1,4 @@
+let jsVersionTime = 2019041217;
 window.onload = async function () {
     let api = null;
 
@@ -118,7 +119,7 @@ window.onload = async function () {
             for (let i = 0; i < options.length; i++) {
                 if (!options.hasOwnProperty(i)) continue;
                 let option = options[i];
-                loadScript(option.ModelUrl, function () {
+                loadScript(option.ModelUrl + "?v=" + jsVersionTime, function () {
                     models[option.Model] = Function(`return ${option.Model}`)();
                     models[option.Model].ProxyUrl = option.ProxyUrl || models[option.Model].ProxyUrl;
                     len--;

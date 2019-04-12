@@ -50,7 +50,7 @@ if (!window.biquguan)
         catalog: function (bookUrl) {
             let self = this;
             return new Promise((resolve, reject) => {
-                API.GetData(`${self.url}${bookUrl}/all.html`, function (data) {
+                API.PutData(`${self.url}${bookUrl}/all.html`, {},function (data) {
                     if (data.Code === 0) {
                         let documentFragment = document.createDocumentFragment();
                         let box = document.createElement("div");
@@ -85,7 +85,7 @@ if (!window.biquguan)
         content: function (catalog) {
             let self = this;
             return new Promise((resolve, reject) => {
-                API.GetData(`${self.url}${catalog.url}`, function (data) {
+                API.PutData(`${self.url}${catalog.url}`,{}, function (data) {
                     if (data.Code === 0) {
                         let documentFragment = document.createDocumentFragment();
                         let box = document.createElement("div");
@@ -115,7 +115,7 @@ if (!window.biquguan)
         update: function (book) {
             let self = this;
             return new Promise((resolve, reject) => {
-                API.GetData(`${self.url}${book.url}`, function (data) {
+                API.PutData(`${self.url}${book.url}`,{}, function (data) {
                     if (data.Code === 0) {
                         let documentFragment = document.createDocumentFragment();
                         let box = document.createElement("div");
