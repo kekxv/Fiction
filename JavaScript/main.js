@@ -340,18 +340,34 @@ window.onload = async function () {
                     }
                 });
             },
-            DelBook: function (data) {
-                DB.Remove({
-                    StoreArray: ["books"],
-                    objectStore: "books",
-                    key: data.title,
-                    success: function (result) {
-                        bookShelf.UpdateData();
-                    },
-                    error: function (result) {
-                        bookShelf.UpdateData();
-                    }
-                });
+            DelBook:async function (data) {
+                try {
+                    await new Promise((resolve, reject) => {
+                        DB.Remove({
+                            StoreArray: ["books"],
+                            objectStore: "books",
+                            key: data.title,
+                            success: function (result) {
+                                resolve()
+                            },
+                            error: function (result) {
+                                reject();
+                            }
+                        });
+                    });
+
+                    DB.Remove({
+                        StoreArray: ["booksCache"],
+                        objectStore: "booksCache",
+                        key: data.title,
+                        success: function (cursor, value) {
+
+                        }
+                    });
+                    bookShelf.UpdateData();
+                }catch (e) {
+                    
+                }
             },
 
         },
@@ -422,7 +438,7 @@ window.onload = async function () {
                     this.showMenu = false;
                     return;
                 }
-                let dom = (event.target || event.srcElement);
+                let dom = (event.currentTarget || event.target || event.srcElement);
                 let x = event.layerX;
                 let y = event.layerY;
                 let w = dom.clientWidth;
@@ -555,7 +571,12 @@ window.onload = async function () {
                     });
 
                     let content = this.$el.querySelector(".content");
+
                     setTimeout(function () {
+                        let oH = content.scrollHeight;
+                        let cH = content.clientHeight;
+                        let pS = Math.ceil(oH / (cH - 18));
+                        content.querySelector("div").style.height = ((cH - 18) * pS - 28) + "px";
                         if (newVal > oldVal) {
                             content.scrollTop = 0;
                         } else {
@@ -564,6 +585,9 @@ window.onload = async function () {
                     }, 10);
                     layer.close(index);
                 }
+            },
+            content:function (newVal,oldVal) {
+
             }
         }
     });
@@ -736,6 +760,10 @@ window.onload = async function () {
             bookCatalog.book = {};
             if (bookShelf.search)
                 history.pushState({}, null, location.href);
+            return;
+        }
+        if (!history.state && bookConfig.isAlive) {
+            bookConfig.isAlive = false;
             return;
         }
         bookShelf.search = false;

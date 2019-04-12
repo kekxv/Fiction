@@ -34,7 +34,10 @@ PHP 跨域代理
 > 1. `data` 请求数据
 > 1. `isJson` 是否是Json格式数据，仅 POST 有效
 > 1. `refererUrl` 跳转地址
+> 1. `Referer` Referer
+> 1. `Host` Host
 > 
+
 
 #### 返回
 
@@ -50,8 +53,8 @@ PHP 跨域代理
 
 > 书源 ： huanyue123
 > 
-> ![测试网站](images/Qr_huanyue123.png)
+> [![测试网站](images/Qr_huanyue123.png)](https://fictionpi.kekxv.com/?ProxyUrl=https://proxycrossdomain.kekxv.com/&Model=huanyue123&ModelUrl=https://fictionpi.kekxv.com/JavaScript/model/huanyue123.js)
 
 > 书源 ： biquguan
 >
-> ![测试网站](images/Qr_biquguan.png)
+> [![测试网站](images/Qr_biquguan.png)](https://fictionpi.kekxv.com/?ProxyUrl=https://proxycrossdomain.kekxv.com/&Model=biquguan&ModelUrl=https://fictionpi.kekxv.com/JavaScript/model/biquguan.js)

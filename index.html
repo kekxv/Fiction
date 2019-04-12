@@ -23,8 +23,8 @@
     <script src="JavaScript/class/vue.js"></script>
 
 
-    <link rel="stylesheet" type="text/css" href="styles/inline.css?v=2019041111">
-    <script src="JavaScript/API.js?v=2019041111"></script>
+    <link rel="stylesheet" type="text/css" href="styles/inline.css?v=2019041209">
+    <script src="JavaScript/API.js?v=2019041209"></script>
 </head>
 <body>
 <div class="bookShelf">
@@ -89,7 +89,9 @@
 
 <div class="bookRead" v-if="CatalogIndex!=-1">
     <div class="bookRead_Catalog" v-text="book.catalog[CatalogIndex].title"></div>
-    <div class="content" v-html="content" @click="TouchBook($event)"></div>
+    <div class="content" @click="TouchBook($event,$this)">
+        <div v-html="content"></div>
+    </div>
     <div class="bookRead_Menu" v-if="showMenu">
         <div @click="menu(0)">上一章</div>
         <div @click="menu(3)">目录</div>
@@ -98,5 +100,5 @@
     </div>
 </div>
 </body>
-<script src="JavaScript/main.js?v=2019041111"></script>
+<script src="JavaScript/main.js?v=2019041209"></script>
 </html>
