@@ -620,11 +620,11 @@ window.onload = async function () {
                             , area: ['90%', 'auto']  //宽高
                             , content: `<div class="BookConfig">
                         <label>
-                        <input name="ProxyUrl" placeholder="代理地址" value="${urlParam.ProxyUrl}" title="例如：http://localhost/ProxyCrossDomain/index.php"></label>
+                        <input name="ProxyUrl" placeholder="代理地址" value="${urlParam.ProxyUrl || ''}" title="例如：http://localhost/ProxyCrossDomain/index.php"></label>
                         <label>
-                        <input name="ModelUrl" placeholder="插件地址" value="${urlParam.ModelUrl}" title="例如：http://localhost/Fiction/JavaScript/model/huanyue123.js"></label>
+                        <input name="ModelUrl" placeholder="插件地址" value="${urlParam.ModelUrl || ''}" title="例如：http://localhost/Fiction/JavaScript/model/huanyue123.js"></label>
                         <label>
-                        <input name="Model" placeholder="插件变量" value="${urlParam.Model}" title="例如：huanyue123"></label>
+                        <input name="Model" placeholder="插件变量" value="${urlParam.Model || ''}" title="例如：huanyue123"></label>
                         </div>`
                             , yes: function (index, layerer) {
                                 isYes = true;

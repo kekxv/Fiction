@@ -55,6 +55,12 @@ PHP 跨域代理
 > 
 > [![测试网站](images/Qr_huanyue123.png)](https://fictionpi.kekxv.com/?ProxyUrl=https://proxycrossdomain.kekxv.com/&Model=huanyue123&ModelUrl=https://fictionpi.kekxv.com/JavaScript/model/huanyue123.js)
 
+
 > 书源 ： biquguan
 >
 > [![测试网站](images/Qr_biquguan.png)](https://fictionpi.kekxv.com/?ProxyUrl=https://proxycrossdomain.kekxv.com/&Model=biquguan&ModelUrl=https://fictionpi.kekxv.com/JavaScript/model/biquguan.js)
+
+
+> 书源 ： lingdiankanshu
+>
+> [![测试网站](images/Qr_lingdiankanshu.png)](https://fictionpi.kekxv.com/?ProxyUrl=https://proxycrossdomain.kekxv.com/&Model=lingdiankanshu&ModelUrl=https://fictionpi.kekxv.com/JavaScript/model/lingdiankanshu.js)
