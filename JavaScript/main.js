@@ -571,6 +571,7 @@ window.onload = async function () {
                     });
 
                     let content = this.$el.querySelector(".content");
+                    content.querySelector("div").style.height = "unset";
 
                     setTimeout(function () {
                         let oH = content.scrollHeight;
