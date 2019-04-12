@@ -6,7 +6,7 @@ if (!window.biquguan)
         search: function (keyword) {
             let self = this;
             return new Promise((resolve, reject) => {
-                API.GetData(`${self.url}/SearchBook.php?q=${keyword}`, function (data) {
+                API.PutData(`${self.url}/SearchBook.php`,{q:keyword}, function (data) {
                     if (data.Code === 0) {
                         let documentFragment = document.createDocumentFragment();
                         let box = document.createElement("div");

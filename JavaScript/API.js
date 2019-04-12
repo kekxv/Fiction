@@ -27,7 +27,7 @@ let API = function (modes) {
 };
 
 API.prototype = {
-    search: async function (keyword,modeKey) {
+    search: async function (keyword, modeKey) {
         let mode = (modeKey && typeof modeKey === "string") ? this.$modes[modeKey] : this.$defMode;
         if (!!mode.ProxyUrl) {
             API.prototype.$ProxyCrossDomainUrl = mode.ProxyUrl;
@@ -86,9 +86,9 @@ API.prototype = {
             }
             data = s;
         }
-        fetch("{0}?url={1}".format(API.prototype.$ProxyCrossDomainUrl, encodeURIComponent(url)),
+        fetch("{0}".format(API.prototype.$ProxyCrossDomainUrl, encodeURIComponent(url)),
             {
-                body: "data={data}".format({data: encodeURIComponent(data)}), // must match 'Content-Type' header
+                body: "url={url}&data={data}".format({data: encodeURIComponent(data), url: encodeURIComponent(url)}), // must match 'Content-Type' header
                 cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
                 // credentials: 'include', // include, same-origin, *omit
                 headers: headers,
