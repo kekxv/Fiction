@@ -104,35 +104,12 @@ if (!window.biquguan)
 
                         }
                         let da = chaptercontent.innerHTML;
-                        if (pb_next !== null) {
-                            da += await new Promise((resolve1, reject1) => {
-                                API.PutData(`${self.url}${catalog.url.split('/').slice(0, -1).join('/')}/${pb_next.getAttribute("href")}`, {}, function (data1) {
-                                    if (data1.Code === 0) {
-                                        let documentFragment = document.createDocumentFragment();
-                                        let box = document.createElement("div");
-                                        data1.Result = data1.Result.replace(/<br\/><br\/>/g, "<br/>");
-                                        data1.Result = data1.Result.replace(/<img([^>]*)>/g, "<img1$1>");
-                                        data1.Result = data1.Result.replace(/<script([^>]*)>/g, "<script1$1>");
-                                        data1.Result = data1.Result.replace(/<link([^>]*)>/g, "<link1$1>");
-                                        box.innerHTML = data1.Result;
-                                        documentFragment.appendChild(box);
-                                        let chaptercontent = box.querySelector("#chaptercontent");
-                                        let pb_next = box.querySelector("#pb_next");
-                                        try {
-                                            chaptercontent.removeChild(chaptercontent.querySelector("div"));
-                                            chaptercontent.removeChild(chaptercontent.querySelector("p"));
-                                        } catch (e) {
-
-                                        }
-                                        let da = chaptercontent.innerHTML;
-                                        resolve1(da);
-                                    } else {
-                                        reject1(data.data1);
-                                    }
-                                }, function (errmess) {
-                                    reject1(errmess);
-                                });
-                            })
+                        if (pb_next !== null && pb_next.innerText.indexOf("页") !== -1) {
+                            let _ = {
+                                title:catalog.title,
+                                url:`${catalog.url.split('/').slice(0, -1).join('/')}/${pb_next.getAttribute("href")}`
+                            };
+                            da += await self.content(_)
                         }
                         resolve(da);
                     } else {
