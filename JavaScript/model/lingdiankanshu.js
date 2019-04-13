@@ -64,11 +64,11 @@ if (!window.lingdiankanshu)
                         for (let i in list) {
                             if (list.hasOwnProperty(i)) {
                                 let dom = list[i];
-                                let bookUrl = dom.getAttribute("href");
+                                let _bookUrl = `${bookUrl}/${dom.getAttribute("href")}`;
                                 let title = dom.innerText;
                                 if (title.indexOf("直达页面底部") !== -1) continue;
                                 da.push({
-                                    url: bookUrl,
+                                    url: _bookUrl,
                                     title: title,
                                 });
                             }
@@ -85,7 +85,7 @@ if (!window.lingdiankanshu)
         content: function (catalog) {
             let self = this;
             return new Promise((resolve, reject) => {
-                API.PutData(`${self.url}${catalog.url}`,{}, function (data) {
+                API.PutData(`${self.url}${catalog.url}`,{}, async function (data) {
                     if (data.Code === 0) {
                         let documentFragment = document.createDocumentFragment();
                         let box = document.createElement("div");
@@ -96,6 +96,7 @@ if (!window.lingdiankanshu)
                         box.innerHTML = data.Result;
                         documentFragment.appendChild(box);
                         let chaptercontent = box.querySelector("#chaptercontent");
+                        let pb_next = box.querySelector("#pb_next");
                         try {
                             chaptercontent.removeChild(chaptercontent.querySelector("div"));
                             chaptercontent.removeChild(chaptercontent.querySelector("p"));
@@ -103,6 +104,36 @@ if (!window.lingdiankanshu)
 
                         }
                         let da = chaptercontent.innerHTML;
+                        if (pb_next !== null) {
+                            da += await new Promise((resolve1, reject1) => {
+                                API.PutData(`${self.url}${catalog.url.split('/').slice(0, -1).join('/')}/${pb_next.getAttribute("href")}`, {}, function (data1) {
+                                    if (data1.Code === 0) {
+                                        let documentFragment = document.createDocumentFragment();
+                                        let box = document.createElement("div");
+                                        data1.Result = data1.Result.replace(/<br\/><br\/>/g, "<br/>");
+                                        data1.Result = data1.Result.replace(/<img([^>]*)>/g, "<img1$1>");
+                                        data1.Result = data1.Result.replace(/<script([^>]*)>/g, "<script1$1>");
+                                        data1.Result = data1.Result.replace(/<link([^>]*)>/g, "<link1$1>");
+                                        box.innerHTML = data1.Result;
+                                        documentFragment.appendChild(box);
+                                        let chaptercontent = box.querySelector("#chaptercontent");
+                                        let pb_next = box.querySelector("#pb_next");
+                                        try {
+                                            chaptercontent.removeChild(chaptercontent.querySelector("div"));
+                                            chaptercontent.removeChild(chaptercontent.querySelector("p"));
+                                        } catch (e) {
+
+                                        }
+                                        let da = chaptercontent.innerHTML;
+                                        resolve1(da);
+                                    } else {
+                                        reject1(data.data1);
+                                    }
+                                }, function (errmess) {
+                                    reject1(errmess);
+                                });
+                            })
+                        }
                         resolve(da);
                     } else {
                         reject(data.Message);

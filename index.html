@@ -89,7 +89,7 @@
 
 <div class="bookRead" v-if="CatalogIndex!=-1">
     <div class="bookRead_Catalog" v-text="book.catalog[CatalogIndex].title"></div>
-    <div class="content" @click="TouchBook($event,$this)">
+    <div class="content" @click="TouchBook($event)">
         <div v-html="content"></div>
     </div>
     <div class="bookRead_Menu" v-if="showMenu">

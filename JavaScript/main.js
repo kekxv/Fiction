@@ -1,8 +1,8 @@
-let jsVersionTime = 2019041217;
+let jsVersionTime = 2019041314;
 window.onload = async function () {
     let api = null;
 
-    let DB = new Database({
+    window.DB = new Database({
         DB: "book"
         , version: 3
         , ObjectStore: [
@@ -357,12 +357,25 @@ window.onload = async function () {
                         });
                     });
 
-                    DB.Remove({
+                    DB.ReadAll({
                         StoreArray: ["booksCache"],
                         objectStore: "booksCache",
                         key: data.title,
+                        index: "title",
                         success: function (cursor, value) {
-
+                            if (cursor) {
+                                DB.Remove({
+                                    StoreArray: ["booksCache"],
+                                    objectStore: "booksCache",
+                                    key: value.CatalogUrl,
+                                    success: function (result) {
+                                    },
+                                    error: function (result) {
+                                    }
+                                });
+                            } else {
+                            }
+                            return true;
                         }
                     });
                     bookShelf.UpdateData();
@@ -431,7 +444,8 @@ window.onload = async function () {
             book: {},
             CatalogIndex: -1,
             content: "",
-            showMenu: false
+            showMenu: false,
+            catalog:null
         },
         methods: {
             TouchBook: function (event) {
@@ -466,6 +480,17 @@ window.onload = async function () {
                         dom.scrollTop -= h + 18;
                         if (flag && dom.scrollTop === 0) {
                             this.menu(0);
+                        }else{
+                            this.catalog.scrollTop = dom.scrollTop;
+                            DB.Update({
+                                StoreArray: ["booksCache"],
+                                objectStore: "booksCache",
+                                data: this.catalog,
+                                success: function (e) {
+                                },
+                                error: function (e) {
+                                }
+                            });
                         }
                     }
                         break;
@@ -475,6 +500,17 @@ window.onload = async function () {
                         dom.scrollTop += h - 18;
                         if (dom.scrollTop === top) {
                             this.menu(2);
+                        }else{
+                            this.catalog.scrollTop = dom.scrollTop;
+                            DB.Update({
+                                StoreArray: ["booksCache"],
+                                objectStore: "booksCache",
+                                data: this.catalog,
+                                success: function (e) {
+                                },
+                                error: function (e) {
+                                }
+                            });
                         }
                     }
                         break;
@@ -515,6 +551,7 @@ window.onload = async function () {
             CatalogIndex: async function (newVal, oldVal) {
                 this.showMenu = false;
                 this.content = "";
+                let self = this;
                 if (newVal > -1) {
                     if (history.state == null) history.pushState({}, null, location.href);
                     let index = layer.load(1, {
@@ -523,7 +560,7 @@ window.onload = async function () {
                     // console.log(this.book.catalog[newVal]);
 
 
-                    let catalog = await new Promise((resolve, reject) => {
+                    self.catalog = await new Promise((resolve, reject) => {
                         DB.ReadAll({
                             StoreArray: ["booksCache"],
                             objectStore: "booksCache",
@@ -540,25 +577,26 @@ window.onload = async function () {
                         });
                     });
 
-                    if (catalog == null) {
-                        let d = {
+                    if (self.catalog == null) {
+                        self.catalog = {
                             CatalogUrl: this.book.catalog[newVal].url,
                             title: this.book.title,
                             content: await api.content(this.book.catalog[newVal], this.book),
-                            CatalogIndex: newVal
+                            CatalogIndex: newVal,
+                            scrollTop: 0
                         };
-                        this.content = d.content;
+                        this.content = self.catalog.content;
                         DB.Update({
                             StoreArray: ["booksCache"],
                             objectStore: "booksCache",
-                            data: d,
+                            data: self.catalog,
                             success: function (e) {
                             },
                             error: function (e) {
                             }
                         });
                     } else {
-                        this.content = catalog.content;
+                        this.content = self.catalog.content;
                     }
                     bookShelf.UpdateBooksCache(this.book);
                     this.book.CatalogIndex = newVal;
@@ -580,11 +618,13 @@ window.onload = async function () {
                         let cH = content.clientHeight;
                         let pS = Math.ceil(oH / (cH - 18));
                         content.querySelector("div").style.height = ((cH - 18) * pS - 28) + "px";
-                        if (newVal > oldVal) {
-                            content.scrollTop = 0;
-                        } else {
-                            content.scrollTop = content.scrollHeight;
+                        // if (newVal > oldVal)
+                        {
+                            content.scrollTop = self.catalog.scrollTop || 0;
                         }
+                        // else {
+                        //     content.scrollTop = content.scrollHeight;
+                        // }
                     }, 10);
                     layer.close(index);
                 }
