@@ -341,7 +341,7 @@ window.onload = async function () {
                     }
                 });
             },
-            DelBook:async function (data) {
+            DelBook: async function (data) {
                 try {
                     await new Promise((resolve, reject) => {
                         DB.Remove({
@@ -379,8 +379,8 @@ window.onload = async function () {
                         }
                     });
                     bookShelf.UpdateData();
-                }catch (e) {
-                    
+                } catch (e) {
+
                 }
             },
 
@@ -418,8 +418,15 @@ window.onload = async function () {
             isAlive: false,
         }
         , watch: {
-            list: function (newVal, oldVal) {
-                this.isAlive = newVal.length > 0;
+            book: function (newVal, oldVal) {
+                let self = this;
+                if (newVal.catalog && newVal.catalog.length > 0) {
+                    if (newVal.CatalogIndex !== undefined) {
+                        setTimeout(function (){
+                            self.$el.querySelector(".bookCatalog_Catalog").parentElement.scrollTop = newVal.CatalogIndex * 35;
+                        },1);
+                    }
+                }
             },
             isAlive: function (newVal, oldVal) {
                 if (newVal) {
@@ -445,7 +452,7 @@ window.onload = async function () {
             CatalogIndex: -1,
             content: "",
             showMenu: false,
-            catalog:null
+            catalog: null
         },
         methods: {
             TouchBook: function (event) {
@@ -480,7 +487,7 @@ window.onload = async function () {
                         dom.scrollTop -= h + 18;
                         if (flag && dom.scrollTop === 0) {
                             this.menu(0);
-                        }else{
+                        } else {
                             this.catalog.scrollTop = dom.scrollTop;
                             DB.Update({
                                 StoreArray: ["booksCache"],
@@ -500,7 +507,7 @@ window.onload = async function () {
                         dom.scrollTop += h - 18;
                         if (dom.scrollTop === top) {
                             this.menu(2);
-                        }else{
+                        } else {
                             this.catalog.scrollTop = dom.scrollTop;
                             DB.Update({
                                 StoreArray: ["booksCache"],
@@ -517,7 +524,8 @@ window.onload = async function () {
                 }
 
             },
-            menu: function (type) {
+            menu: async function (type) {
+                let self = this;
                 switch (type) {
                     case 0: {
                         if (this.CatalogIndex === 0) {
@@ -542,6 +550,28 @@ window.onload = async function () {
                         } else {
                             layer.msg("当前已经是最新一章", {icon: 1});
                         }
+                    }
+                        break;
+                    case 4: { // 刷新当前章节
+
+                        self.content = "";
+                        self.catalog = {
+                            CatalogUrl: this.book.catalog[self.CatalogIndex].url,
+                            title: this.book.title,
+                            content: await api.content(this.book.catalog[self.CatalogIndex], this.book),
+                            CatalogIndex: self.CatalogIndex,
+                            scrollTop: 0
+                        };
+                        self.content = self.catalog.content;
+                        DB.Update({
+                            StoreArray: ["booksCache"],
+                            objectStore: "booksCache",
+                            data: self.catalog,
+                            success: function (e) {
+                            },
+                            error: function (e) {
+                            }
+                        });
                     }
                         break;
                 }
@@ -629,7 +659,7 @@ window.onload = async function () {
                     layer.close(index);
                 }
             },
-            content:function (newVal,oldVal) {
+            content: function (newVal, oldVal) {
 
             }
         }
