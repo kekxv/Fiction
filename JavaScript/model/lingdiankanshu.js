@@ -1,6 +1,7 @@
 if (!window.lingdiankanshu)
     window.lingdiankanshu = {
         mode: "lingdiankanshu",
+        title:"零点看书lingdiankanshu",
         url: "https://m.lingdiankanshu.co/",
         ProxyUrl: "http://127.0.0.1/ProxyCrossDomain/",
         search: function (keyword) {

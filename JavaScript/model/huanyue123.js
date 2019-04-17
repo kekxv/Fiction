@@ -1,6 +1,7 @@
 if (!window.huanyue123)
     window.huanyue123 = {
         mode: "huanyue123",
+        title:"幻月书院",
         url: "http://m.huanyue123.com/",
         ProxyUrl: "http://127.0.0.1/ProxyCrossDomain/",
         search: function (keyword) {

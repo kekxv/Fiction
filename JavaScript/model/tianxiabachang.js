@@ -1,6 +1,7 @@
 if (!window.tianxiabachang)
     window.tianxiabachang = {
         mode: "tianxiabachang",
+        title:"笔趣阁tianxiabachang",
         url: "https://m.tianxiabachang.cn",
         ProxyUrl: "http://127.0.0.1/ProxyCrossDomain/",
         search: function (keyword) {

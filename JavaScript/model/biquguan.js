@@ -1,6 +1,7 @@
 if (!window.biquguan)
     window.biquguan = {
         mode: "biquguan",
+        title:"笔趣馆 biquguan",
         url: "https://m.biquguan.com",
         ProxyUrl: "http://127.0.0.1/ProxyCrossDomain/",
         search: function (keyword) {
