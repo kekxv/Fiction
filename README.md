@@ -64,3 +64,10 @@ PHP 跨域代理
 > 书源 ： lingdiankanshu
 >
 > [![测试网站](images/Qr_lingdiankanshu.png)](https://fictionpi.kekxv.com/?ProxyUrl=https://proxycrossdomain.kekxv.com/&Model=lingdiankanshu&ModelUrl=https://fictionpi.kekxv.com/JavaScript/model/lingdiankanshu.js)
+
+> **其他书源**
+>
+> [mingzhuxiaoshuo](https://fictionpi.kekxv.com/?ProxyUrl=https://proxycrossdomain.kekxv.com/&Model=mingzhuxiaoshuo&ModelUrl=https://fictionpi.kekxv.com/JavaScript/model/mingzhuxiaoshuo.js)
+> 
+> [tianxiabachang](https://fictionpi.kekxv.com/?ProxyUrl=https://proxycrossdomain.kekxv.com/&Model=tianxiabachang&ModelUrl=https://fictionpi.kekxv.com/JavaScript/model/tianxiabachang.js)
+> 

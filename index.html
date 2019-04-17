@@ -21,10 +21,11 @@
     <script src="JavaScript/class/JsNotification.js"></script>
     <script src="JavaScript/class/Database.js"></script>
     <script src="JavaScript/class/vue.js"></script>
+    <script src="JavaScript/class/gbk.js"></script>
 
 
-    <link rel="stylesheet" type="text/css" href="styles/inline.css?v=2019041618">
-    <script src="JavaScript/API.js?v=2019041618"></script>
+    <link rel="stylesheet" type="text/css" href="styles/inline.css?v=2019041701">
+    <script src="JavaScript/API.js?v=2019041701"></script>
 </head>
 <body>
 <div class="bookShelf">
@@ -37,7 +38,7 @@
         </form>
         <select v-model="modeKey" v-if="search || searchKeyword.length>0"
                 style="padding:10px 2px;margin-right: 5px;width: 100%;margin-top: 10px;background: white;">
-            <option v-for="item in booksSource" :value="item.mode" v-text="item.mode"></option>
+            <option v-for="item in booksSource" :value="item.mode" v-text="item.title || item.mode"></option>
         </select>
     </div>
     <div class="book_list" v-if="isUpdating > 0" style="font-size: 14px;padding: 3px;text-align: center;">
@@ -101,5 +102,5 @@
     </div>
 </div>
 </body>
-<script src="JavaScript/main.js?v=2019041618"></script>
+<script src="JavaScript/main.js?v=2019041701"></script>
 </html>

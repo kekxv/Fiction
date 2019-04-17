@@ -1,4 +1,4 @@
-let jsVersionTime = 20190413151;
+let jsVersionTime = 20190417;
 window.onload = async function () {
     let api = null;
 
@@ -695,6 +695,8 @@ window.onload = async function () {
                         <input name="ModelUrl" placeholder="插件地址" value="${urlParam.ModelUrl || ''}" title="例如：http://localhost/Fiction/JavaScript/model/huanyue123.js"></label>
                         <label>
                         <input name="Model" placeholder="插件变量" value="${urlParam.Model || ''}" title="例如：huanyue123"></label>
+                        <label>
+                        <input name="title" placeholder="插件标题" value="" title="例如：起点"></label>
                         </div>`
                             , yes: function (index, layerer) {
                                 isYes = true;
@@ -703,6 +705,7 @@ window.onload = async function () {
                                     ProxyUrl: layerer[0].querySelector("input[name='ProxyUrl'").value,
                                     ModelUrl: layerer[0].querySelector("input[name='ModelUrl'").value,
                                     Model: layerer[0].querySelector("input[name='Model'").value,
+                                    Title: layerer[0].querySelector("input[name='title'").value,
                                 };
                                 if (!option.ProxyUrl || !option.ModelUrl || !option.Model) {
                                     isYes = false;
@@ -756,6 +759,8 @@ window.onload = async function () {
                         <input name="ModelUrl" placeholder="插件地址" value="${item.ModelUrl}"></label>
                         <label>
                         <input name="Model" placeholder="插件变量" disabled readonly value="${item.Model}"></label>
+                        <label>
+                        <input name="title" placeholder="插件变量" value="${item.Title || ''}"></label>
                         </div>`
                             , yes: function (index, layerer) {
                                 isYes = true;
@@ -764,6 +769,7 @@ window.onload = async function () {
                                     ProxyUrl: layerer[0].querySelector("input[name='ProxyUrl'").value,
                                     ModelUrl: layerer[0].querySelector("input[name='ModelUrl'").value,
                                     Model: layerer[0].querySelector("input[name='Model'").value,
+                                    Title: layerer[0].querySelector("input[name='title'").value,
                                 };
                                 if (!option.ProxyUrl || !option.ModelUrl || !option.Model) {
                                     isYes = false;

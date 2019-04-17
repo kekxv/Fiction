@@ -129,4 +129,5 @@ API.prototype = {
 API.GetData = API.prototype.GetData;
 API.PutData = API.prototype.PutData;
 API.PutJson = API.prototype.PutJson;
+API.GBKencodeURI = GBK.URI.encodeURI;
 
