@@ -93,7 +93,7 @@ if (!window.tianxiabachang)
         content: function (catalog) {
             let self = this;
             return new Promise((resolve, reject) => {
-                API.PutData(`${self.url.replace("m.", "www.")}${catalog.url}`, {isPc: "TRUE"}, async function (data) {
+                API.GetData(`${self.url.replace("m.", "www.")}${catalog.url}`, async function (data) {
                     if (data.Code === 0) {
                         let documentFragment = document.createDocumentFragment();
                         let box = document.createElement("div");
@@ -131,7 +131,7 @@ if (!window.tianxiabachang)
         update: function (book) {
             let self = this;
             return new Promise((resolve, reject) => {
-                API.PutData(`${self.url}${book.url}`, {}, function (data) {
+                API.GetData(`${self.url}${book.url}`, function (data) {
                     if (data.Code === 0) {
                         let documentFragment = document.createDocumentFragment();
                         let box = document.createElement("div");

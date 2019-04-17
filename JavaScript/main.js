@@ -1,4 +1,4 @@
-let jsVersionTime = 20190417;
+let jsVersionTime = 2019041701;
 window.onload = async function () {
     let api = null;
 
