@@ -38,7 +38,7 @@
         </form>
         <select v-model="modeKey" v-if="search || searchKeyword.length>0"
                 style="padding:10px 2px;margin-right: 5px;width: 100%;margin-top: 10px;background: white;">
-            <option v-for="item in booksSource" :value="item.mode" v-text="item.title || item.mode"></option>
+            <option v-for="item in booksSource" :value="item.mode" v-text="item.title + '['+ item.mode +']'"></option>
         </select>
     </div>
     <div class="book_list" v-if="isUpdating > 0" style="font-size: 14px;padding: 3px;text-align: center;">
