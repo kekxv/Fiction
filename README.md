@@ -6,6 +6,10 @@
 
 [使用说明](Use.md)
 
+## 代理栗子
+
+php ： [ProxyCrossDomain](https://github.com/kekxv/ProxyCrossDomain)
+
 ## 书源问题
 
 自行设置：
