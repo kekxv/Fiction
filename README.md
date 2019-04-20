@@ -52,26 +52,3 @@ PHP 跨域代理
 > 1. `Message` 结果信息
 > 1. `Result:` 结果内容
 
-
-## Demo 
-
-> 书源 ： huanyue123
-> 
-> [![测试网站](images/Qr_huanyue123.png)](https://fictionpi.kekxv.com/?ProxyUrl=https://proxycrossdomain.kekxv.com/&Model=huanyue123&ModelUrl=https://fictionpi.kekxv.com/JavaScript/model/huanyue123.js)
-
-
-> 书源 ： biquguan
->
-> [![测试网站](images/Qr_biquguan.png)](https://fictionpi.kekxv.com/?ProxyUrl=https://proxycrossdomain.kekxv.com/&Model=biquguan&ModelUrl=https://fictionpi.kekxv.com/JavaScript/model/biquguan.js)
-
-
-> 书源 ： lingdiankanshu
->
-> [![测试网站](images/Qr_lingdiankanshu.png)](https://fictionpi.kekxv.com/?ProxyUrl=https://proxycrossdomain.kekxv.com/&Model=lingdiankanshu&ModelUrl=https://fictionpi.kekxv.com/JavaScript/model/lingdiankanshu.js)
-
-> **其他书源**
->
-> [mingzhuxiaoshuo](https://fictionpi.kekxv.com/?ProxyUrl=https://proxycrossdomain.kekxv.com/&Model=mingzhuxiaoshuo&ModelUrl=https://fictionpi.kekxv.com/JavaScript/model/mingzhuxiaoshuo.js)
-> 
-> [tianxiabachang](https://fictionpi.kekxv.com/?ProxyUrl=https://proxycrossdomain.kekxv.com/&Model=tianxiabachang&ModelUrl=https://fictionpi.kekxv.com/JavaScript/model/tianxiabachang.js)
-> 
