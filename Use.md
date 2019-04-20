@@ -1,29 +1,8 @@
 # 使用说明
 
-## 功能介绍
+[TOC]
 
-1. 默认界面
-
-  <img src="./images/Use/1.png" style="width:300px;"/>
-
-1. 添加书源
-
-  <div style="display:flex;">
-    <img src="./images/Use/2.png" style="width:200px;height:400px;"/>
-    <img src="./images/Use/3.png" style="width:200px;height:400px;"/>
-    <img src="./images/Use/4.png" style="width:200px;height:400px;"/>
-    <img src="./images/Use/5.png" style="width:200px;height:400px;"/>
-  </div>
-
-1. 搜索，使用
-
-<div style="display:flex;">
-  <img src="./images/Use/7.png" style="width:200px;height:400px;"/>
-  <img src="./images/Use/8.png" style="width:200px;height:400px;"/>
-  <img src="./images/Use/9.png" style="width:200px;height:400px;"/>
-  <img src="./images/Use/10.png" style="width:200px;height:400px;"/>
-</div>
-
+最后有使用说明
 
 ## 开发书源
 
@@ -303,4 +282,29 @@ if (!window.书源变量)
         }
     };
 ```
+
+
+## 功能介绍
+
+1. 默认界面
+
+  <img src="./images/Use/1.png" style="width:300px;"/>
+
+1. 添加书源
+
+  <div style="display:flex;">
+    <img src="./images/Use/2.png" style="width:200px;height:400px;"/>
+    <img src="./images/Use/3.png" style="width:200px;height:400px;"/>
+    <img src="./images/Use/4.png" style="width:200px;height:400px;"/>
+    <img src="./images/Use/5.png" style="width:200px;height:400px;"/>
+  </div>
+
+1. 搜索，使用
+
+<div style="display:flex;">
+  <img src="./images/Use/7.png" style="width:200px;height:400px;"/>
+  <img src="./images/Use/8.png" style="width:200px;height:400px;"/>
+  <img src="./images/Use/9.png" style="width:200px;height:400px;"/>
+  <img src="./images/Use/10.png" style="width:200px;height:400px;"/>
+</div>
 
