@@ -1,8 +1,8 @@
-if (!window.lingdiankanshu)
-    window.lingdiankanshu = {
-        mode: "lingdiankanshu",
-        title:"零点看书",
-        url: "https://m.lingdiankanshu.co/",
+if (!window.biquguan)
+    window.biquguan = {
+        mode: "biquguan",
+        title:"笔趣馆",
+        url: "https://m.biquguan.com",
         ProxyUrl: "http://127.0.0.1/ProxyCrossDomain/",
         search: function (keyword) {
             let self = this;
@@ -60,16 +60,16 @@ if (!window.lingdiankanshu)
                         data.Result = data.Result.replace(/<link([^>]*)>/g, "<link1$1>");
                         box.innerHTML = data.Result;
                         documentFragment.appendChild(box);
-                        let list = box.querySelectorAll("#chapterlist > p a:not([style^='color'])");
+                        let list = box.querySelectorAll("#chapterlist > p a");
                         let da = [];
                         for (let i in list) {
                             if (list.hasOwnProperty(i)) {
                                 let dom = list[i];
-                                let _bookUrl = `${bookUrl}/${dom.getAttribute("href")}`;
+                                let bookUrl = dom.getAttribute("href");
                                 let title = dom.innerText;
                                 if (title.indexOf("直达页面底部") !== -1) continue;
                                 da.push({
-                                    url: _bookUrl,
+                                    url: bookUrl,
                                     title: title,
                                 });
                             }

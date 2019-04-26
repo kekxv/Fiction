@@ -93,7 +93,7 @@ if (!window.mingzhuxiaoshuo)
         content: function (catalog) {
             let self = this;
             return new Promise((resolve, reject) => {
-                API.GetData(`${self.url}${catalog.url}`, async function (data) {
+                API.GetData(`${self.url}${catalog.url}`, function (data) {
                     if (data.Code === 0) {
                         let documentFragment = document.createDocumentFragment();
                         let box = document.createElement("div");

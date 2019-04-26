@@ -205,11 +205,9 @@ div.bookCatalog_Catalog{
 div.bookCatalog_Catalog span:last-child{
     border: 1px solid;
     padding: 5px 9px;
-    position: absolute;
-    right: 5px;
-    top: 5px;
-    bottom: 5px;
     border-radius: 5px;
+    float: right;
+    margin-top: -5px;
 }
 
 div.bookRead > div.bookRead_Catalog,

@@ -27,28 +27,28 @@ let API = function (modes) {
 };
 
 API.prototype = {
-    search: async function (keyword, modeKey) {
+    search: function (keyword, modeKey) {
         let mode = (modeKey && typeof modeKey === "string") ? this.$modes[modeKey] : this.$defMode;
         if (!!mode.ProxyUrl) {
             API.prototype.$ProxyCrossDomainUrl = mode.ProxyUrl;
         }
         return mode.search(keyword);
     },
-    catalog: async function (keyword, bookinfo) {
+    catalog: function (keyword, bookinfo) {
         let mode = (bookinfo && typeof bookinfo.mode === "string") ? this.$modes[bookinfo.mode] : this.$defMode;
         if (!!mode.ProxyUrl) {
             API.prototype.$ProxyCrossDomainUrl = mode.ProxyUrl;
         }
         return mode.catalog(keyword);
     },
-    content: async function (catalog, bookinfo) {
+    content: function (catalog, bookinfo) {
         let mode = (bookinfo && typeof bookinfo.mode === "string") ? this.$modes[bookinfo.mode] : this.$defMode;
         if (!!mode.ProxyUrl) {
             API.prototype.$ProxyCrossDomainUrl = mode.ProxyUrl;
         }
         return mode.content(catalog);
     },
-    update: async function (bookinfo) {
+    update: function (bookinfo) {
         let mode = (bookinfo && typeof bookinfo.mode === "string") ? this.$modes[bookinfo.mode] : this.$defMode;
         if (!!mode.ProxyUrl) {
             API.prototype.$ProxyCrossDomainUrl = mode.ProxyUrl;
@@ -57,6 +57,18 @@ API.prototype = {
     },
     $ProxyCrossDomainUrl: "",
     GetData: function (url, callback, err) {
+        if (API.IsClient()) {
+            NavigatorAPI.GetData(
+                url,
+                NavigatorCallback.pushCallback(function (...values) {
+                    callback && callback(values[0]);
+                }),
+                NavigatorCallback.pushCallback(function (...values) {
+                    err && err(values[0]);
+                })
+            );
+            return;
+        }
         let headers = {};
         fetch("{0}?url={1}".format(API.prototype.$ProxyCrossDomainUrl, encodeURIComponent(url)),
             {
@@ -86,6 +98,22 @@ API.prototype = {
             }
             data = s;
         }
+        if (API.IsClient()) {
+            NavigatorAPI.PutData(
+                url,
+                JSON.stringify({
+                    ContentType: headers["Content-Type"],
+                    data: data
+                }),
+                NavigatorCallback.pushCallback(function (...values) {
+                    callback && callback(values[0]);
+                }),
+                NavigatorCallback.pushCallback(function (...values) {
+                    err && err(values[0]);
+                })
+            );
+            return;
+        }
         fetch("{0}".format(API.prototype.$ProxyCrossDomainUrl, encodeURIComponent(url)),
             {
                 body: "url={url}&data={data}".format({data: encodeURIComponent(data), url: encodeURIComponent(url)}), // must match 'Content-Type' header
@@ -103,6 +131,19 @@ API.prototype = {
             }).then(callback || console.log).catch(err || console.log).catch(err || console.log)
     },
     PutJson: function (url, data, callback, err) {
+        if (API.IsClient()) {
+            NavigatorAPI.PutJson(
+                url,
+                typeof data === "string" ? data : JSON.stringify(data),
+                NavigatorCallback.pushCallback(function (...values) {
+                    callback && callback(values[0]);
+                }),
+                NavigatorCallback.pushCallback(function (...values) {
+                    err && err(values[0]);
+                })
+            );
+            return;
+        }
         let headers = {
             'Content-Type': 'application/json',
         };
@@ -124,10 +165,17 @@ API.prototype = {
             .then(function (response) {
                 return response.json()
             }).then(callback || console.log).catch(err || console.log).catch(err || console.log)
-    }
+    },
+
 };
 API.GetData = API.prototype.GetData;
 API.PutData = API.prototype.PutData;
 API.PutJson = API.prototype.PutJson;
 API.GBKencodeURI = GBK.URI.encodeURI;
 
+/**
+ * @return {boolean}
+ */
+API.IsClient = function () {
+    return window.NavigatorCallback !== undefined && window.NavigatorAPI !== undefined;
+};

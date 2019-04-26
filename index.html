@@ -22,10 +22,13 @@
     <script src="JavaScript/class/Database.js"></script>
     <script src="JavaScript/class/vue.js"></script>
     <script src="JavaScript/class/gbk.js"></script>
+    <!--    <script src="JavaScript/class/vconsole.min.js"></script>-->
+    <!--    <script>var vConsole = new VConsole();</script>-->
 
 
-    <link rel="stylesheet" type="text/css" href="styles/inline.css?v=2019041701">
-    <script src="JavaScript/API.js?v=2019041701"></script>
+    <link rel="stylesheet" type="text/css" href="styles/inline.css?v=2019042201">
+    <script src="JavaScript/API.js?v=2019042201"></script>
+
 </head>
 <body>
 <div class="bookShelf">
@@ -80,7 +83,8 @@
     </div>
     <div>
         <div class="bookCatalog_Catalog"><span>目录</span><span @click="GoBottom($event)">最新</span></div>
-        <div class="book_catalog" v-for="el,index in book.catalog " :style="{background:book.CatalogIndex==index?'#d4f1ff':''}" @click="GoReadBook(book,index)">
+        <div class="book_catalog" v-for="el,index in book.catalog "
+             :style="{background:book.CatalogIndex==index?'#d4f1ff':''}" @click="GoReadBook(book,index)">
             <p>
                 <span>{{el.title}}</span>
             </p>
@@ -102,5 +106,5 @@
     </div>
 </div>
 </body>
-<script src="JavaScript/main.js?v=2019041701"></script>
+<script src="JavaScript/main.js?v=2019042201"></script>
 </html>
