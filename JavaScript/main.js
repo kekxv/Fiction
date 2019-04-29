@@ -1,5 +1,10 @@
 let jsVersionTime = 2019042201;
+let api = null;
+let booksSourceAPI = null;
 window.onload = function () {
+    let bookShelf;
+    let bookCatalog;
+    let bookRead;
 
     Promise.prototype.finally = Promise.prototype.finally || function (fn) {
         function finFn(valueORreason) {
@@ -11,43 +16,9 @@ window.onload = function () {
     };
 
 
-    //1.获取到列表的dom，刷新显示部分的dom，列表父容器的dom
-    let parent = document.body;
-    //2.定义一些需要常用的变量
-    let startY = 0;//手指触摸最开始的Y坐标
-    let endY = 0;//手指结束触摸时的Y坐标
-    let dom = null;
-
-    //3.给列表dom监听touchstart事件,得到起始位置的Y坐标
-    parent.addEventListener('touchstart', function (e) {
-        dom = e.target || e.toElement || e.srcElement;
-        startY = e.touches[0].pageY;
-        endY = startY;
-    });
-    //4.给列表dom监听touchmove事件，当移动到一定程度需要显示上面的文字
-    parent.addEventListener('touchmove', function (e) {
-        dom = e.target || e.toElement || e.srcElement;
-        endY = e.touches[0].pageY;
-        if (isTop(dom) && (endY - startY) > 0) {
-            // console.log('下拉了');
-        }
-    });
-    //5.给列表dom监听touchend事件，此时说明用户已经松开了手指，应该进行异步操作了
-    parent.addEventListener('touchend', function (e) {
-        if (dom.className === "bookShelf" && isTop(dom) && (endY - startY) > 300) {
-            location.reload();
-        }
-    });
-
-    function isTop(dom) {
-        return dom && dom.scrollTop === 0;
-    }
-
-    let api = null;
-
     window.DB = new Database({
         DB: "book"
-        , version: 3
+        , version: 9
         , ObjectStore: [
             {
                 name: "books", keyPath: "title", Index: [
@@ -72,9 +43,271 @@ window.onload = function () {
                     , {name: "ProxyUrl", key: "ProxyUrl", unique: false}
                 ]
             },
+            {
+                name: "BooksSource", keyPath: "Model", Index: [
+                    {name: "Model", key: "Model", unique: true}
+                    , {name: "Name", key: "Name", unique: false}
+                    , {name: "ProxyUrl", key: "ProxyUrl", unique: false}
+                ]
+            },
         ],
         onupgradeneeded: function (db) {
             let self = this;
+
+            let modes = [
+                {
+                    Name: "笔趣阁",
+                    Model: "m.tianxiabachang.cn",
+                    url: "https://m.tianxiabachang.cn",
+                    ProxyUrl: "http://127.0.0.1/ProxyCrossDomain/",
+                    isGBK: false,
+                    search: {
+                        url: "https://m.tianxiabachang.cn/s.php?s={{keyword}}",
+                        IsPost: false,
+                        selector: "$ul.fk li",
+                        Data: "{}",
+                        data: {
+                            url: "$a$$1@href",
+                            title: "$a$$1@Text",
+                            author: "$a$$2@Text",
+                            time: "",
+                            state: "",
+                            image: "",
+                        }
+                    },
+                    catalog: {
+                        url: "https://www.tianxiabachang.cn{{url}}",
+                        selector: "$#list dl>*",
+                        screen: "正文",
+                        screenSelector: "@Text",
+                        data: {
+                            url: "a@href",
+                            title: "a@Text",
+                        }
+                    },
+                    content: {
+                        url: "https://www.tianxiabachang.cn/{{url}}",
+                        selector: "#content",
+                        pbNext: "#pb_next@href",
+                        pbNextKey: {selector: "#pb_next@Text", screen: "页"},
+                        data: "@innerHtml",
+                        type: 1
+                    },
+                    update: {
+                        url: "https://m.tianxiabachang.cn/{{url}}",
+                        selector: "#xinxi",
+                        data: {
+                            time: "$ul li$$4@Text",
+                            state: "$ul li$$3@Text",
+                            image: "img@src",
+                        }
+                    },
+                },
+                {
+                    Name: "笔趣馆",
+                    Model: "m.biquguan.com",
+                    url: "https://m.biquguan.com",
+                    ProxyUrl: "http://127.0.0.1/ProxyCrossDomain/",
+                    isGBK: false,
+                    search: {
+                        url: "https://m.biquguan.com/SearchBook.php",
+                        IsPost: true,
+                        selector: "$.hot_sale",
+                        Data: JSON.stringify({q: "{{keyword}}"}),
+                        data: {
+                            url: "a@href",
+                            title: ".title@Text",
+                            author: "$.author$$0@Text",
+                            time: "",
+                            state: "$.author$$1@Text",
+                            image: "",
+                        }
+                    },
+                    catalog: {
+                        url: "https://m.biquguan.com/{{url}}/all.html",
+                        selector: "#chapterlist > p a",
+                        screen: "直达页面底部",
+                        screenSelector: "@Text",
+                        data: {
+                            url: "@href",
+                            title: "@Text",
+                        }
+                    },
+                    content: {
+                        url: "https://m.biquguan.com/{{url}}",
+                        selector: "#chaptercontent",
+                        pbNext: "#pb_next@href",
+                        pbNextKey: {selector: "#pb_next@Text", screen: "页"},
+                        data: "@innerHtml",
+                        type: 1
+                    },
+                    update: {
+                        url: "https://m.biquguan.com/{{url}}",
+                        selector: ".synopsisArea_detail",
+                        data: {
+                            time: "$p$$4@Text",
+                            state: "$p$$3@Text",
+                            image: "img@src",
+                        }
+                    },
+                },
+                {
+                    Name: "名著小说",
+                    Model: "www.mingzhuxiaoshuo.com",
+                    url: "http://www.mingzhuxiaoshuo.com",
+                    ProxyUrl: "http://127.0.0.1/ProxyCrossDomain/",
+                    isGBK: true,
+                    search: {
+                        url: "http://www.mingzhuxiaoshuo.com/Search.asp?s={{keyword}}",
+                        IsPost: false,
+                        selector: "$table[width=\"100%\"][bordercolorlight=\"#f7edd3\"] tr:not([bgcolor])",
+                        Data: JSON.stringify({}),
+                        data: {
+                            url: "$td$$0a@href",
+                            title: "$td$$0@Text",
+                            author: "$td$$2@Text",
+                            time: "",
+                            state: "$td$$4@Text",
+                            image: "",
+                        }
+                    },
+                    catalog: {
+                        url: "http://www.mingzhuxiaoshuo.com/{{urlPath}}",
+                        selector: "li a[title]",
+                        data: {
+                            url: "@href",
+                            title: "@Text",
+                        }
+                    },
+                    content: {
+                        url: "http://www.mingzhuxiaoshuo.com/{{url}}",
+                        selector: "div[class=\"width\"]",
+                        pbNext: "#pb_next@href",
+                        pbNextKey: {selector: "#pb_next@Text", screen: "页"},
+                        data: "@innerHtml",
+                        type: 2
+                    },
+                    update: {
+                        url: "http://www.mingzhuxiaoshuo.com/{{url}}",
+                        selector: "",
+                        data: {
+                            time: "table td.huikuang",
+                            state: "table td.tuchuhuang12@Text",
+                            image: "table img[alt][onerror]@src",
+                        }
+                    },
+                },
+                {
+                    Name: "幻月书院",
+                    Model: "m.huanyue123.com",
+                    url: "http://m.huanyue123.com",
+                    ProxyUrl: "http://127.0.0.1/ProxyCrossDomain/",
+                    isGBK: false,
+                    search: {
+                        url: "http://m.huanyue123.com/s.php",
+                        IsPost: true,
+                        selector: "$.hot_sale",
+                        Data: JSON.stringify({keyword: "{{keyword}}"}),
+                        data: {
+                            url: "a@href",
+                            title: ".title@Text",
+                            author: "$.author$$1@Text",
+                            time: "",
+                            state: "$.author$$0@Text",
+                            image: "",
+                        }
+                    },
+                    catalog: {
+                        url: "http://m.huanyue123.com/{{url}}/all.html",
+                        selector: "$#chapterlist > p a",
+                        screen: "直达页面底部",
+                        screenSelector: "@Text",
+                        data: {
+                            url: "@href",
+                            title: "@Text",
+                        }
+                    },
+                    content: {
+                        url: "http://m.huanyue123.com/{{url}}",
+                        selector: "#chaptercontent",
+                        data: "@innerHtml",
+                        type: 1
+                    },
+                    update: {
+                        url: "http://m.huanyue123.com/{{url}}",
+                        selector: ".synopsisArea_detail",
+                        data: {
+                            time: "$p$$3@Text",
+                            state: "p.upchapter@Text",
+                            image: "img@src",
+                        }
+                    },
+                },
+                {
+                    Name: "零点看书",
+                    Model: "m.lingdiankanshu.co",
+                    url: "https://m.lingdiankanshu.co/",
+                    ProxyUrl: "http://127.0.0.1/ProxyCrossDomain/",
+                    isGBK: false,
+                    search: {
+                        url: "https://m.lingdiankanshu.co/SearchBook.php?q={{keyword}}",
+                        IsPost: false,
+                        selector: "$.hot_sale",
+                        Data: JSON.stringify({q: "{{keyword}}"}),
+                        data: {
+                            url: "a@href",
+                            title: ".title@Text",
+                            author: "$.author$$0@Text",
+                            time: "",
+                            state: "$.author$$1@Text",
+                            image: "",
+                        }
+                    },
+                    catalog: {
+                        url: "https://m.lingdiankanshu.co/{{url}}/all.html",
+                        selector: "#chapterlist > p a:not([style^='color'])",
+                        data: {
+                            url: "@href",
+                            title: "@Text",
+                        }
+                    },
+                    content: {
+                        url: "https://m.lingdiankanshu.co/{{url}}",
+                        selector: "#chaptercontent",
+                        pbNext: "#pb_next@href",
+                        pbNextKey: {selector: "#pb_next@Text", screen: "页"},
+                        data: "@innerHtml",
+                        type: 1
+                    },
+                    update: {
+                        url: "https://m.lingdiankanshu.co/{{url}}",
+                        selector: ".synopsisArea_detail",
+                        data: {
+                            time: "$p$$4@Text",
+                            state: "$p$$3@Text",
+                            image: "img@src",
+                        }
+                    },
+                },
+            ];
+            self.ready = function () {
+                for (let i in modes) {
+                    if (!modes.hasOwnProperty(i)) continue;
+                    let mode = modes[i];
+
+                    self.Update({
+                        StoreArray: ["BooksSource"],
+                        objectStore: "BooksSource",
+                        data: mode,
+                        success: function (e) {
+                            // layer.msg('添加成功。。', {icon: 1});
+                        },
+                        error: function (e) {
+                            // layer.msg('添加失败,已存在书架中。。', {icon: 2});
+                        }
+                    });
+                }
+            }
         }
     });
 
@@ -133,56 +366,18 @@ window.onload = function () {
         return requestParameters;
     }
 
-    function UpdateModels() {
-        return new Promise((res, rej) => {
-            new Promise((resolve, reject) => {
-                let da = [];
-                DB.ReadAll({
-                    StoreArray: ["booksSource"],
-                    objectStore: "booksSource",
-                    success: function (cursor, value) {
-                        if (cursor) {
-                            da.push(value)
-                        } else {
-                            resolve(da);
-                        }
-                        return true;
-                    }
-                });
-            }).then(options => {
-                bookConfig.booksSources = options;
-                let models = {};
-                new Promise((resolve, reject) => {
-                    let len = options.length;
-                    for (let i = 0; i < options.length; i++) {
-                        if (!options.hasOwnProperty(i)) continue;
-                        let option = options[i];
-                        loadScript(option.ModelUrl + "?v=" + jsVersionTime, function () {
-                            models[option.Model] = Function(`return ${option.Model}`)();
-                            models[option.Model].ProxyUrl = option.ProxyUrl || models[option.Model].ProxyUrl;
-                            len--;
-                            if (len === 0) {
-                                resolve();
-                            }
-                        });
-                    }
-                }).then(function (data) {
-                    if (api === null) {
-                        api = new API(models);
-                    } else {
-                        api.$modes = models;
-                    }
-                    res(models);
-                });
-            });
-        });
-    }
-
     DB.ready = function () {
+
+        booksSourceAPI = new BooksSourceAPI(DB, function (models) {
+            api = new API(this);
+
+            bookShelf.booksSource = models;
+            bookShelf.UpdateData();
+        });
 
         let urlParam = getUrlParam();
 
-        let bookShelf = new Vue({
+        bookShelf = new Vue({
             el: ".bookShelf",
             data: {
                 search: false,
@@ -198,7 +393,7 @@ window.onload = function () {
                         shade: [0.2, '#FFF'] //0.1透明度的白色背景
                     });
                     if (window.navigator.onLine && !update) {
-                        api.catalog(book.data.url, book).finally(function () {
+                        api.catalog(book).finally(function () {
                             layer.close(index);
                         }).then(function (catalog) {
                             book.catalog = catalog;
@@ -266,7 +461,7 @@ window.onload = function () {
                                     try {
                                         let isUpdate = (!item.catalog || item.catalog.length === 0) || time.trim() !== bookinfo.time.trim();
                                         if (isUpdate) {
-                                            api.catalog(bookinfo.url, item).then(function (catalog) {
+                                            api.catalog(item).then(function (catalog) {
                                                 item.data = bookinfo;
                                                 item.catalog = catalog;
                                                 layer.msg(`《${bookinfo.title}》有更新。。`, {icon: 1});
@@ -359,14 +554,31 @@ window.onload = function () {
                         }
                     });
                 },
+                ImportMode: function () {
+                    layer.open({
+                        id: 1,
+                        type: 1,
+                        title: '导入书源',
+                        area: ['90%', 'auto'],
+
+                        content: `<div style="padding: 0.5em;"><p>粘贴导入：</p><p><textarea style="width: 100%;border: 1px solid #000;min-height: 250px;"></textarea></p></div>`
+                        ,
+                        btn: ['保存', '取消'],
+                        btn1: function (index, layero) {
+                            let mode = layero.find("textarea").val();
+                            console.log(mode);
+                        },
+                        btn2: function (index, layero) {
+                            layer.close(index);
+                        }
+
+                    });
+                },
+                reload: function () {
+                    location.reload();
+                },
                 searchBook: function () {
                     if (this.searchKeyword.length === 0) {
-                        // search?'书架':'设置'
-                        if (this.search) {
-                            this.UpdateData();
-                        } else {
-                            bookConfig.isAlive = true;
-                        }
                         return;
                     }
                     let index = layer.load(1, {
@@ -454,7 +666,7 @@ window.onload = function () {
                 booksSource: function (newVal, oldVal) {
                     for (let i in newVal) {
                         if (newVal.hasOwnProperty(i)) {
-                            this.modeKey = i;
+                            this.modeKey = newVal[i].Model;
                             break;
                         }
                     }
@@ -466,7 +678,7 @@ window.onload = function () {
                 }
             }
         });
-        let bookCatalog = new Vue({
+        bookCatalog = new Vue({
             el: '.bookCatalog',
             data: {
                 book: {},
@@ -500,7 +712,7 @@ window.onload = function () {
                 }
             },
         });
-        let bookRead = new Vue({
+        bookRead = new Vue({
             el: ".bookRead",
             data: {
                 book: {},
@@ -743,152 +955,11 @@ window.onload = function () {
             }
         });
 
-        let bookConfig = new Vue({
-            el: ".bookConfig",
-            data: {
-                isAlive: false,
-                booksSources: [],
-            },
-            methods: {
-                delSources: function (item) {
-                    // console.log(item);
-                    layer.msg("暂不支持删除");
-                },
-                addSource: function () {
-                    let isYes = false;
-                    new Promise((resolve, reject) => {
-                        //页面层
-                        layer.open({
-                            type: 1
-                            , title: '添加新源'
-                            , skin: 'layui-layer-lan'
-                            , anim: 5 //动画类型
-                            , btn: ['确定']
-                            , area: ['90%', 'auto']  //宽高
-                            , content: `<div class="BookConfig">
-                        <label>
-                        <input name="ProxyUrl" placeholder="代理地址" value="${urlParam.ProxyUrl || ''}" title="例如：http://localhost/ProxyCrossDomain/index.php"></label>
-                        <label>
-                        <input name="ModelUrl" placeholder="插件地址" value="${urlParam.ModelUrl || ''}" title="例如：http://localhost/Fiction/JavaScript/model/huanyue123.js"></label>
-                        <label>
-                        <input name="Model" placeholder="插件变量" value="${urlParam.Model || ''}" title="例如：huanyue123"></label>
-                        </div>`
-                            , yes: function (index, layerer) {
-                                isYes = true;
-                                layer.close(index);
-                                let option = {
-                                    ProxyUrl: layerer[0].querySelector("input[name='ProxyUrl'").value,
-                                    ModelUrl: layerer[0].querySelector("input[name='ModelUrl'").value,
-                                    Model: layerer[0].querySelector("input[name='Model'").value,
-                                };
-                                if (!option.ProxyUrl || !option.ModelUrl || !option.Model) {
-                                    isYes = false;
-                                    return;
-                                }
-                                resolve(option);
-                            }
-                            , end: function () {
-                                if (!isYes) {
-                                    reject();
-                                }
-                            }
-                        });
-                    }).then(function (option) {
-                        DB.Add({
-                            StoreArray: ["booksSource"],
-                            objectStore: "booksSource",
-                            data: option,
-                            success: function (e) {
-                                layer.msg('添加书源成功。。', {icon: 1}, function () {
-                                    location.reload();
-                                });
-                            },
-                            error: function (e) {
-                                layer.msg('添加书源失败。。', {icon: 2});
-                            }
-                        });
-                    }).catch(function () {
-
-                    });
-                },
-                putSources: function (item) {
-                    let isYes = false;
-                    new Promise((resolve, reject) => {
-                        //页面层
-                        layer.open({
-                            type: 1
-                            , title: '修改书源'
-                            , skin: 'layui-layer-lan'
-                            , anim: 5 //动画类型
-                            , btn: ['确定']
-                            , area: ['90%', 'auto']  //宽高
-                            , content: `<div class="BookConfig">
-                        <label>
-                        <input name="ProxyUrl" placeholder="代理地址" value="${item.ProxyUrl}"></label>
-                        <label>
-                        <input name="ModelUrl" placeholder="插件地址" value="${item.ModelUrl}"></label>
-                        <label>
-                        <input name="Model" placeholder="插件变量" disabled readonly value="${item.Model}"></label>
-                        </div>`
-                            , yes: function (index, layerer) {
-                                isYes = true;
-                                layer.close(index);
-                                let option = {
-                                    ProxyUrl: layerer[0].querySelector("input[name='ProxyUrl'").value,
-                                    ModelUrl: layerer[0].querySelector("input[name='ModelUrl'").value,
-                                    Model: layerer[0].querySelector("input[name='Model'").value,
-                                };
-                                if (!option.ProxyUrl || !option.ModelUrl || !option.Model) {
-                                    isYes = false;
-                                    return;
-                                }
-                                resolve(option);
-                            }
-                            , end: function () {
-                                if (!isYes) {
-                                    reject();
-                                }
-                            }
-                        });
-                    }).then(function (option) {
-                        DB.Update({
-                            StoreArray: ["booksSource"],
-                            objectStore: "booksSource",
-                            data: option,
-                            success: function (e) {
-                                layer.msg('更新书源成功。。', {icon: 1}, function () {
-                                    location.reload();
-                                });
-                            },
-                            error: function (e) {
-                                layer.msg('更新书源失败。。', {icon: 2});
-                            }
-                        });
-                    }).catch(function () {
-
-                    });
-                }
-            },
-            watch: {
-                isAlive: function (newVal, oldVal) {
-                    if (newVal) {
-                        if (!history.state) {
-                            history.pushState({}, null, location.href);
-                        }
-                    }
-                }
-            }
-        });
 
         window.bookShelf = bookShelf;
         window.bookCatalog = bookCatalog;
         window.bookRead = bookRead;
-        window.bookConfig = bookConfig;
 
-        UpdateModels().then(function (models) {
-            bookShelf.booksSource = models;
-            bookShelf.UpdateData();
-        });
 
         //拦截安卓回退按钮
         // history.pushState(null, null, location.href);
@@ -903,10 +974,6 @@ window.onload = function () {
                 bookCatalog.book = {};
                 if (bookShelf.search)
                     history.pushState({}, null, location.href);
-                return;
-            }
-            if (!history.state && bookConfig.isAlive) {
-                bookConfig.isAlive = false;
                 return;
             }
             bookShelf.search = false;

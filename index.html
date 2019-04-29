@@ -14,6 +14,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="Weather PWA">
     <meta name="msapplication-TileColor" content="#2F3BA2">
+    <link rel="stylesheet" href="styles/class/font-awesome-4.7.0/css/font-awesome.css">
     <title>Fiction</title>
     <script src="JavaScript/class/jquery.min.js"></script>
     <script src="JavaScript/class/layer/layer.js"></script>
@@ -26,8 +27,9 @@
     <!--    <script>var vConsole = new VConsole();</script>-->
 
 
-    <link rel="stylesheet" type="text/css" href="styles/inline.css?v=2019042201">
-    <script src="JavaScript/API.js?v=2019042201"></script>
+    <link rel="stylesheet" type="text/css" href="styles/inline.css?v=2019042901">
+    <script src="JavaScript/BooksSourceAPI.js?v=2019042901"></script>
+    <script src="JavaScript/API.js?v=2019042901"></script>
 
 </head>
 <body>
@@ -35,17 +37,22 @@
 
     <div class="book_list">
         <form style="display: flex;" onsubmit="return false;">
+            <button class="fa fa-home button button-border button-rounded" style="padding: 0.5em;margin-right: 5px;"
+                    @click="reload()"></button>
+            <button class="fa fa-copy button button-border button-rounded" style="padding: 0.5em;margin-right: 5px;"
+                    @click="ImportMode()"></button>
             <input style="min-width:1em;flex: 1;margin-right: 10px;" v-model="searchKeyword" placeholder="请输入要搜索的小说">
-            <button type="submit" class="button button-border button-rounded" @click="searchBook()"
-                    v-text="searchKeyword.length==0?(search?'书架':'设置'):'搜索'"></button>
+            <button type="submit" class="fa fa-search button button-border button-rounded"
+                    style="padding: 0.5em;" @click="searchBook()"></button>
         </form>
         <select v-model="modeKey" v-if="search || searchKeyword.length>0"
                 style="padding:10px 2px;margin-right: 5px;width: 100%;margin-top: 10px;background: white;">
-            <option v-for="item in booksSource" :value="item.mode" v-text="item.title + '['+ item.mode +']'"></option>
+            <option v-for="item,index in booksSource" :value="item.Model"
+                    v-text="item.Name + '['+ item.Model +']'"></option>
         </select>
     </div>
-    <div class="book_list" v-if="isUpdating > 0" style="font-size: 14px;padding: 3px;text-align: center;">
-        正在更新
+    <div class="book_list" v-text="isUpdating > 0?'正在更新':'更新完毕'" :style="{color:isUpdating > 0?'red':'green'}" style="color:green;font-size: 14px;padding: 3px;text-align: center;">
+
     </div>
     <div class="book_list" v-for="el in list"
          :class="{'hasUpdate':(el.CatalogIndex==undefined?-1:el.CatalogIndex)+1< el.catalog.length}">
@@ -64,18 +71,6 @@
         <div class="book_list_readed" v-if="!search">
             {{(el.CatalogIndex==undefined?-1:el.CatalogIndex)+1}}/{{el.catalog.length}}
         </div>
-    </div>
-</div>
-<div class="bookConfig" v-if="isAlive">
-    <div class="book_list">
-        <h3>书源管理</h3>
-    </div>
-
-    <div class="book_list" style="text-align: center;" @click="addSource">添加书源</div>
-    <div class="book_list" v-for="item in booksSources" style="display: flex;">
-        <p style="flex:1;padding: 5px;"><span v-text="item.Model"></span></p>
-        <p class="miniButton" @click="delSources(item);">删除</p>&nbsp;
-        <p class="miniButton" @click="putSources(item);">修改</p>
     </div>
 </div>
 <div class="bookCatalog" v-if="book.catalog && book.catalog.length>0">
@@ -106,5 +101,5 @@
     </div>
 </div>
 </body>
-<script src="JavaScript/main.js?v=2019042201"></script>
+<script src="JavaScript/main.js?v=2019042901"></script>
 </html>

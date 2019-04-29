@@ -7,7 +7,7 @@
             let result = this;
             if (arguments.length === 1 && typeof (args) === "object") {
                 for (let key in args) {
-                    let reg = new RegExp("({" + key + "})", "g");
+                    let reg = new RegExp("({{" + key + "}})", "g");
                     result = result.replace(reg, args[key]);
                 }
             } else {
@@ -15,7 +15,7 @@
                     if (arguments[i] === undefined) {
                         return "";
                     } else {
-                        let reg = new RegExp("({[" + i + "]})", "g");
+                        let reg = new RegExp("({{[" + i + "]}})", "g");
                         result = result.replace(reg, arguments[i]);
                     }
                 }

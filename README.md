@@ -10,22 +10,11 @@
 
 php ： [ProxyCrossDomain](https://github.com/kekxv/ProxyCrossDomain)
 
+Android ： [AndroidFiction](https://github.com/kekxv/AndroidFiction)
+
 ## 书源问题
 
-自行设置：
-
-1.  代理地址
-1.  插件地址
-1.  插件变量
-
-自动填充代码：
-
-    http://localhost/Fiction/index.html?ProxyUrl={代理地址}&Model={书源变量}&ModelUrl={书源脚本地址}
-    
-例如
-
-    http://localhost/Fiction/index.html?ProxyUrl=http://127.0.0.1/ProxyCrossDomain/index.php&Model=huanyue123&ModelUrl=http://127.0.0.1/Fiction/JavaScript/model/huanyue123.js
-  
+查看 [使用说明](Use.md)
    
 ## 代理地址格式
 
@@ -56,26 +45,3 @@ PHP 跨域代理
 > 1. `Message` 结果信息
 > 1. `Result:` 结果内容
 
-
-## Demo 
-
-> 书源 ： huanyue123
-> 
-> [![测试网站](images/Qr_huanyue123.png)](https://fictionpi.kekxv.com/?ProxyUrl=https://proxycrossdomain.kekxv.com/&Model=huanyue123&ModelUrl=https://fictionpi.kekxv.com/JavaScript/model/huanyue123.js)
-
-
-> 书源 ： biquguan
->
-> [![测试网站](images/Qr_biquguan.png)](https://fictionpi.kekxv.com/?ProxyUrl=https://proxycrossdomain.kekxv.com/&Model=biquguan&ModelUrl=https://fictionpi.kekxv.com/JavaScript/model/biquguan.js)
-
-
-> 书源 ： lingdiankanshu
->
-> [![测试网站](images/Qr_lingdiankanshu.png)](https://fictionpi.kekxv.com/?ProxyUrl=https://proxycrossdomain.kekxv.com/&Model=lingdiankanshu&ModelUrl=https://fictionpi.kekxv.com/JavaScript/model/lingdiankanshu.js)
-
-> **其他书源**
->
-> [mingzhuxiaoshuo](https://fictionpi.kekxv.com/?ProxyUrl=https://proxycrossdomain.kekxv.com/&Model=mingzhuxiaoshuo&ModelUrl=https://fictionpi.kekxv.com/JavaScript/model/mingzhuxiaoshuo.js)
-> 
-> [tianxiabachang](https://fictionpi.kekxv.com/?ProxyUrl=https://proxycrossdomain.kekxv.com/&Model=tianxiabachang&ModelUrl=https://fictionpi.kekxv.com/JavaScript/model/tianxiabachang.js)
-> 

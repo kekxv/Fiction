@@ -134,7 +134,7 @@ div.book_list img {
 
 div.book_list > div > div {
     padding: 5px;
-    height: 135px;
+    min-height: 135px;
 }
 
 div.book_list div.book_list_readed {
@@ -282,4 +282,12 @@ div.BookConfig input{
     border-radius: 3px;
     text-align: center;
     background: rgba(27, 154, 247, 0.08);
+}
+
+.content *{
+    background: unset !important;
+    color: #000;
+}
+.content a{
+    display: none;
 }

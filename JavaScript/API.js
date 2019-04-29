@@ -1,59 +1,25 @@
-let API = function (modes) {
-    let defKey = null;
-    for (let k in modes) {
-        if (modes.hasOwnProperty(k)) {
-            defKey = k;
-            break;
-        }
-    }
-    if (defKey == null) throw new Error("参数错误");
+let API = function (booksSourceAPI) {
     Object.defineProperty(this, "$modes", {
         enumerable: false,
         configurable: false,
         get() {
-            return modes;
-        },
-        set(v) {
-            modes = v;
-        }
-    });
-    Object.defineProperty(this, "$defMode", {
-        enumerable: false,
-        configurable: false,
-        get() {
-            return this.$modes[defKey];
+            return booksSourceAPI;
         }
     });
 };
 
 API.prototype = {
     search: function (keyword, modeKey) {
-        let mode = (modeKey && typeof modeKey === "string") ? this.$modes[modeKey] : this.$defMode;
-        if (!!mode.ProxyUrl) {
-            API.prototype.$ProxyCrossDomainUrl = mode.ProxyUrl;
-        }
-        return mode.search(keyword);
+        return this.$modes.Search(keyword,modeKey);
     },
-    catalog: function (keyword, bookinfo) {
-        let mode = (bookinfo && typeof bookinfo.mode === "string") ? this.$modes[bookinfo.mode] : this.$defMode;
-        if (!!mode.ProxyUrl) {
-            API.prototype.$ProxyCrossDomainUrl = mode.ProxyUrl;
-        }
-        return mode.catalog(keyword);
+    catalog: function (book) {
+        return this.$modes.Catalog(book);
     },
     content: function (catalog, bookinfo) {
-        let mode = (bookinfo && typeof bookinfo.mode === "string") ? this.$modes[bookinfo.mode] : this.$defMode;
-        if (!!mode.ProxyUrl) {
-            API.prototype.$ProxyCrossDomainUrl = mode.ProxyUrl;
-        }
-        return mode.content(catalog);
+        return this.$modes.Content(bookinfo,catalog);
     },
     update: function (bookinfo) {
-        let mode = (bookinfo && typeof bookinfo.mode === "string") ? this.$modes[bookinfo.mode] : this.$defMode;
-        if (!!mode.ProxyUrl) {
-            API.prototype.$ProxyCrossDomainUrl = mode.ProxyUrl;
-        }
-        return mode.update(bookinfo.data);
+        return this.$modes.Update(bookinfo);
     },
     $ProxyCrossDomainUrl: "",
     GetData: function (url, callback, err) {
@@ -70,7 +36,7 @@ API.prototype = {
             return;
         }
         let headers = {};
-        fetch("{0}?url={1}".format(API.prototype.$ProxyCrossDomainUrl, encodeURIComponent(url)),
+        fetch("{{0}}?url={{1}}".format(API.prototype.$ProxyCrossDomainUrl, encodeURIComponent(url)),
             {
                 cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
                 // credentials: 'include', // include, same-origin, *omit
@@ -94,7 +60,7 @@ API.prototype = {
             for (let i in data) {
                 if (!data.hasOwnProperty(i)) continue;
                 if (s.length > 0) s += "&";
-                s += "{key}={value}".format({key: i, value: encodeURIComponent(data[i])});
+                s += "{{key}}={{value}}".format({key: i, value: encodeURIComponent(data[i])});
             }
             data = s;
         }
@@ -114,9 +80,9 @@ API.prototype = {
             );
             return;
         }
-        fetch("{0}".format(API.prototype.$ProxyCrossDomainUrl, encodeURIComponent(url)),
+        fetch("{{0}}".format(API.prototype.$ProxyCrossDomainUrl, encodeURIComponent(url)),
             {
-                body: "url={url}&data={data}".format({data: encodeURIComponent(data), url: encodeURIComponent(url)}), // must match 'Content-Type' header
+                body: "url={{url}}&data={{data}}".format({data: encodeURIComponent(data), url: encodeURIComponent(url)}), // must match 'Content-Type' header
                 cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
                 // credentials: 'include', // include, same-origin, *omit
                 headers: headers,
@@ -147,7 +113,7 @@ API.prototype = {
         let headers = {
             'Content-Type': 'application/json',
         };
-        fetch("{0}?url={1}".format(API.prototype.$ProxyCrossDomainUrl, encodeURIComponent(url)),
+        fetch("{{0}}?url={{1}}".format(API.prototype.$ProxyCrossDomainUrl, encodeURIComponent(url)),
             {
                 body: JSON.stringify({
                     data: JSON.stringify(data),
