@@ -43,7 +43,7 @@
                     @click="ImportMode()"></button>
             <input style="min-width:1em;flex: 1;margin-right: 10px;" v-model="searchKeyword" placeholder="请输入要搜索的小说">
             <button type="submit" class="fa fa-search button button-border button-rounded"
-                    style="padding: 0.5em;" @click="searchBook()"></button>
+                    style="padding: 0.5em;" @click="searchBook();return false;"></button>
         </form>
         <select v-model="modeKey" v-if="search || searchKeyword.length>0"
                 style="padding:10px 2px;margin-right: 5px;width: 100%;margin-top: 10px;background: white;">

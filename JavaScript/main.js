@@ -18,7 +18,7 @@ window.onload = function () {
 
     window.DB = new Database({
         DB: "book"
-        , version: 9
+        , version: 10
         , ObjectStore: [
             {
                 name: "books", keyPath: "title", Index: [
@@ -291,6 +291,34 @@ window.onload = function () {
                 },
             ];
             self.ready = function () {
+
+                DB.ReadAll({
+                    StoreArray: ["books"],
+                    objectStore: "books",
+                    success: function (cursor, value) {
+                        if (cursor) {
+                            for (let m in modes) {
+                                if (!modes.hasOwnProperty(m)) continue;
+                                if (modes[m].Model.indexOf(value.mode)) {
+                                    value.mode = m;
+                                    DB.Update({
+                                        StoreArray: ["books"],
+                                        objectStore: "books",
+                                        data: value,
+                                        success: function (e) {
+                                        },
+                                        error: function (e) {
+                                        }
+                                    });
+                                    break;
+                                }
+                            }
+                        } else {
+                        }
+                        return true;
+                    }
+                });
+
                 for (let i in modes) {
                     if (!modes.hasOwnProperty(i)) continue;
                     let mode = modes[i];
@@ -554,7 +582,53 @@ window.onload = function () {
                         }
                     });
                 },
+                /**
+                 * @return {boolean}
+                 */
+                AddMode:function (mode) {
+                    if(!mode.hasOwnProperty("Name"))return false;
+                    if(!mode.hasOwnProperty("Model"))return false;
+                    if(!mode.hasOwnProperty("url"))return false;
+                    if(!mode.hasOwnProperty("search"))return false;
+                    if(!mode.hasOwnProperty("catalog"))return false;
+                    if(!mode.hasOwnProperty("content"))return false;
+                    if(!mode.hasOwnProperty("update"))return false;
+                    if(!mode.search.hasOwnProperty("url"))return false;
+                    if(!mode.search.hasOwnProperty("selector"))return false;
+                    if(!mode.search.hasOwnProperty("data"))return false;
+                    if(!mode.search.data.hasOwnProperty("url"))return false;
+                    if(!mode.search.data.hasOwnProperty("title"))return false;
+                    if(!mode.catalog.hasOwnProperty("url"))return false;
+                    if(!mode.catalog.hasOwnProperty("selector"))return false;
+                    if(!mode.catalog.hasOwnProperty("data"))return false;
+                    if(!mode.catalog.data.hasOwnProperty("url"))return false;
+                    if(!mode.catalog.data.hasOwnProperty("title"))return false;
+                    if(!mode.content.hasOwnProperty("url"))return false;
+                    if(!mode.content.hasOwnProperty("selector"))return false;
+                    if(!mode.content.hasOwnProperty("data"))return false;
+                    if(!mode.update.hasOwnProperty("url"))return false;
+                    if(!mode.update.hasOwnProperty("selector"))return false;
+                    if(!mode.update.hasOwnProperty("data"))return false;
+                    if(!mode.update.data.hasOwnProperty("time"))return false;
+                    if(!mode.update.data.hasOwnProperty("state"))return false;
+
+
+                    self.Update({
+                        StoreArray: ["BooksSource"],
+                        objectStore: "BooksSource",
+                        data: mode,
+                        success: function (e) {
+                            // layer.msg('添加成功。。', {icon: 1});
+                        },
+                        error: function (e) {
+                            // layer.msg('添加失败,已存在书架中。。', {icon: 2});
+                        }
+                    });
+
+                    return true;
+                },
                 ImportMode: function () {
+                    let self = this;
                     layer.open({
                         id: 1,
                         type: 1,
@@ -566,7 +640,26 @@ window.onload = function () {
                         btn: ['保存', '取消'],
                         btn1: function (index, layero) {
                             let mode = layero.find("textarea").val();
-                            console.log(mode);
+                            if(!mode){
+                                layer.msg("未输入任何数据");
+                                return ;
+                            }
+                            try{
+                                let count = 0;
+                                let modes = JSON.parse(mode);
+                                if(modes instanceof Array){
+                                    for(let i in modes){
+                                        if(modes.hasOwnProperty(i)){
+                                            count+= self.AddMode(modes[i])?1:0;
+                                        }
+                                    }
+                                }else if(modes instanceof Object){
+                                    count+= self.AddMode(modes)?1:0;
+                                }
+                                layer.msg("成功添加或更新 [ {{0}} ] 个书源".format(count));
+                            }catch (e) {
+                                layer.msg("格式错误");
+                            }
                         },
                         btn2: function (index, layero) {
                             layer.close(index);
@@ -914,9 +1007,13 @@ window.onload = function () {
                                         let cH = content.clientHeight;
                                         let pS = Math.ceil(oH / (cH - 18));
                                         content.querySelector("div").style.height = ((cH - 18) * pS - 28) + "px";
-                                        content.scrollTop = self.catalog.scrollTop || 0;
+                                        if (oldVal + 1 === newVal) {
+                                            content.scrollTop = 0;
+                                        } else {
+                                            content.scrollTop = self.catalog.scrollTop || 0;
+                                        }
                                         layer.close(index);
-                                    }, 10);
+                                    }, 200);
                                 });
                             } else {
                                 self.content = self.catalog.content;
@@ -940,9 +1037,13 @@ window.onload = function () {
                                     let cH = content.clientHeight;
                                     let pS = Math.ceil(oH / (cH - 18));
                                     content.querySelector("div").style.height = ((cH - 18) * pS - 28) + "px";
-                                    content.scrollTop = self.catalog.scrollTop || 0;
+                                    if (oldVal + 1 === newVal) {
+                                        content.scrollTop = 0;
+                                    } else {
+                                        content.scrollTop = self.catalog.scrollTop || 0;
+                                    }
                                     layer.close(index);
-                                }, 10);
+                                }, 200);
                             }
                         }).catch(function () {
                             layer.close(index);
