@@ -300,7 +300,7 @@ window.onload = function () {
                             for (let m in modes) {
                                 if (!modes.hasOwnProperty(m)) continue;
                                 if (modes[m].Model.indexOf(value.mode)) {
-                                    value.mode = m;
+                                    value.mode = modes[m].Model;
                                     DB.Update({
                                         StoreArray: ["books"],
                                         objectStore: "books",
