@@ -90,15 +90,16 @@ JsNotification.prototype.popNotice = function () {
 };
 JsNotification.prototype.popConfirm = function () {
     let ret = confirm(this.title + "\n" + this.options.body);
-    if (typeof this.options.show !== "undefined")
-        this.options.show.call(this);
+    if (typeof this.options.show !== "undefined") {
+        this.options.show.call(this,null);
+    }
     if (ret) {
         if (typeof this.options.click !== "undefined")
-            this.options.click.call(this);
+            this.options.click.call(this,null);
     } else {
         if (typeof this.options.error !== "undefined")
-            this.options.error.call(this);
+            this.options.error.call(this,null);
     }
     if (typeof this.options.close !== "undefined")
-        this.options.close.call(this);
+        this.options.close.call(this,null);
 };
