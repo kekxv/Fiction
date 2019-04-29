@@ -299,7 +299,7 @@ window.onload = function () {
                         if (cursor) {
                             for (let m in modes) {
                                 if (!modes.hasOwnProperty(m)) continue;
-                                if (modes[m].Model.indexOf(value.mode)) {
+                                if (modes[m].Model.indexOf(value.mode) !== -1) {
                                     value.mode = modes[m].Model;
                                     DB.Update({
                                         StoreArray: ["books"],
@@ -585,32 +585,32 @@ window.onload = function () {
                 /**
                  * @return {boolean}
                  */
-                AddMode:function (mode) {
-                    if(!mode.hasOwnProperty("Name"))return false;
-                    if(!mode.hasOwnProperty("Model"))return false;
-                    if(!mode.hasOwnProperty("url"))return false;
-                    if(!mode.hasOwnProperty("search"))return false;
-                    if(!mode.hasOwnProperty("catalog"))return false;
-                    if(!mode.hasOwnProperty("content"))return false;
-                    if(!mode.hasOwnProperty("update"))return false;
-                    if(!mode.search.hasOwnProperty("url"))return false;
-                    if(!mode.search.hasOwnProperty("selector"))return false;
-                    if(!mode.search.hasOwnProperty("data"))return false;
-                    if(!mode.search.data.hasOwnProperty("url"))return false;
-                    if(!mode.search.data.hasOwnProperty("title"))return false;
-                    if(!mode.catalog.hasOwnProperty("url"))return false;
-                    if(!mode.catalog.hasOwnProperty("selector"))return false;
-                    if(!mode.catalog.hasOwnProperty("data"))return false;
-                    if(!mode.catalog.data.hasOwnProperty("url"))return false;
-                    if(!mode.catalog.data.hasOwnProperty("title"))return false;
-                    if(!mode.content.hasOwnProperty("url"))return false;
-                    if(!mode.content.hasOwnProperty("selector"))return false;
-                    if(!mode.content.hasOwnProperty("data"))return false;
-                    if(!mode.update.hasOwnProperty("url"))return false;
-                    if(!mode.update.hasOwnProperty("selector"))return false;
-                    if(!mode.update.hasOwnProperty("data"))return false;
-                    if(!mode.update.data.hasOwnProperty("time"))return false;
-                    if(!mode.update.data.hasOwnProperty("state"))return false;
+                AddMode: function (mode) {
+                    if (!mode.hasOwnProperty("Name")) return false;
+                    if (!mode.hasOwnProperty("Model")) return false;
+                    if (!mode.hasOwnProperty("url")) return false;
+                    if (!mode.hasOwnProperty("search")) return false;
+                    if (!mode.hasOwnProperty("catalog")) return false;
+                    if (!mode.hasOwnProperty("content")) return false;
+                    if (!mode.hasOwnProperty("update")) return false;
+                    if (!mode.search.hasOwnProperty("url")) return false;
+                    if (!mode.search.hasOwnProperty("selector")) return false;
+                    if (!mode.search.hasOwnProperty("data")) return false;
+                    if (!mode.search.data.hasOwnProperty("url")) return false;
+                    if (!mode.search.data.hasOwnProperty("title")) return false;
+                    if (!mode.catalog.hasOwnProperty("url")) return false;
+                    if (!mode.catalog.hasOwnProperty("selector")) return false;
+                    if (!mode.catalog.hasOwnProperty("data")) return false;
+                    if (!mode.catalog.data.hasOwnProperty("url")) return false;
+                    if (!mode.catalog.data.hasOwnProperty("title")) return false;
+                    if (!mode.content.hasOwnProperty("url")) return false;
+                    if (!mode.content.hasOwnProperty("selector")) return false;
+                    if (!mode.content.hasOwnProperty("data")) return false;
+                    if (!mode.update.hasOwnProperty("url")) return false;
+                    if (!mode.update.hasOwnProperty("selector")) return false;
+                    if (!mode.update.hasOwnProperty("data")) return false;
+                    if (!mode.update.data.hasOwnProperty("time")) return false;
+                    if (!mode.update.data.hasOwnProperty("state")) return false;
 
 
                     self.Update({
@@ -640,24 +640,24 @@ window.onload = function () {
                         btn: ['保存', '取消'],
                         btn1: function (index, layero) {
                             let mode = layero.find("textarea").val();
-                            if(!mode){
+                            if (!mode) {
                                 layer.msg("未输入任何数据");
-                                return ;
+                                return;
                             }
-                            try{
+                            try {
                                 let count = 0;
                                 let modes = JSON.parse(mode);
-                                if(modes instanceof Array){
-                                    for(let i in modes){
-                                        if(modes.hasOwnProperty(i)){
-                                            count+= self.AddMode(modes[i])?1:0;
+                                if (modes instanceof Array) {
+                                    for (let i in modes) {
+                                        if (modes.hasOwnProperty(i)) {
+                                            count += self.AddMode(modes[i]) ? 1 : 0;
                                         }
                                     }
-                                }else if(modes instanceof Object){
-                                    count+= self.AddMode(modes)?1:0;
+                                } else if (modes instanceof Object) {
+                                    count += self.AddMode(modes) ? 1 : 0;
                                 }
                                 layer.msg("成功添加或更新 [ {{0}} ] 个书源".format(count));
-                            }catch (e) {
+                            } catch (e) {
                                 layer.msg("格式错误");
                             }
                         },
