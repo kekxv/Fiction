@@ -37,10 +37,10 @@
 
     <div class="book_list">
         <form style="display: flex;" onsubmit="return false;">
-            <button class="fa fa-home button button-border button-rounded" style="padding: 0.5em;margin-right: 5px;"
-                    @click="reload()"></button>
-            <button class="fa fa-copy button button-border button-rounded" style="padding: 0.5em;margin-right: 5px;"
-                    @click="ImportMode()"></button>
+            <span class="fa fa-home button button-border button-rounded" style="line-height: 1.5em;padding: 0.5em;margin-right: 5px;"
+                    @click="reload()"></span>
+            <span class="fa fa-copy button button-border button-rounded" style="line-height: 1.5em;padding: 0.5em;margin-right: 5px;"
+                    @click="ImportMode()"></span>
             <input style="min-width:1em;flex: 1;margin-right: 10px;" v-model="searchKeyword" placeholder="请输入要搜索的小说">
             <button type="submit" class="fa fa-search button button-border button-rounded"
                     style="padding: 0.5em;" @click="searchBook();return false;"></button>
