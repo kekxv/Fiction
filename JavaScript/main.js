@@ -18,7 +18,7 @@ window.onload = function () {
 
     window.DB = new Database({
         DB: "book"
-        , version: 10
+        , version: 11
         , ObjectStore: [
             {
                 name: "books", keyPath: "title", Index: [
