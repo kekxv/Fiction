@@ -668,7 +668,11 @@ window.onload = function () {
                     });
                 },
                 reload: function () {
-                    location.reload();
+                    if (this.search) {
+                        window.history.back();
+                    } else {
+                        this.UpdateBooksCache();
+                    }
                 },
                 searchBook: function () {
                     if (this.searchKeyword.length === 0) {
@@ -677,11 +681,11 @@ window.onload = function () {
                     let index = layer.load(1, {
                         shade: [0.2, '#FFF'] //0.1透明度的白色背景
                     });
-                    this.search = true;
                     let self = this;
                     api.search(this.searchKeyword, this.modeKey).finally(function () {
                         layer.close(index);
                     }).then(function (list) {
+                        self.search = true;
                         self.list = list;
                     }).catch(function (e) {
                         layer.msg("搜索失败");
@@ -1074,6 +1078,7 @@ window.onload = function () {
                 bookCatalog.book = {};
                 if (bookShelf.search)
                     history.pushState({}, null, location.href);
+                bookShelf.search = false;
                 return;
             }
             bookShelf.search = false;

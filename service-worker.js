@@ -1,5 +1,5 @@
-let DATA_CACHE_NAME = 'Fiction-v3';
-let CACHE_NAME = 'Fiction-4';
+let DATA_CACHE_NAME = 'Fiction-v4';
+let CACHE_NAME = 'Fiction-5';
 let IsDebug = false;
 let filesToCache = [
     './',
