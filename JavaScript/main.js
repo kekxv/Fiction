@@ -949,7 +949,7 @@ window.onload = function () {
                         let index = layer.load(1, {
                             shade: [0.2, '#FFF'] //0.1透明度的白色背景,
                         });
-                        // console.log(this.book.catalog[newVal]);
+
 
                         new Promise((resolve, reject) => {
                             DB.ReadAll({
@@ -967,6 +967,10 @@ window.onload = function () {
                                 }
                             });
                         }).then(function (catalog) {
+
+                            let content = self.$el.querySelector(".content");
+                            content.querySelector("div").style.height = "auto";
+
                             self.catalog = catalog;
                             if (self.catalog == null) {
                                 api.content(self.book.catalog[newVal], self.book).then(function (Content) {
@@ -999,9 +1003,6 @@ window.onload = function () {
                                         }
                                     });
 
-                                    let content = self.$el.querySelector(".content");
-                                    content.querySelector("div").style.height = "unset";
-
                                     setTimeout(function () {
                                         let oH = content.scrollHeight;
                                         let cH = content.clientHeight;
@@ -1029,8 +1030,6 @@ window.onload = function () {
                                     }
                                 });
 
-                                let content = this.$el.querySelector(".content");
-                                content.querySelector("div").style.height = "unset";
 
                                 setTimeout(function () {
                                     let oH = content.scrollHeight;

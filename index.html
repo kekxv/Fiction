@@ -14,6 +14,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="Weather PWA">
     <meta name="msapplication-TileColor" content="#2F3BA2">
+    <!-- CODELAB: Add description here -->
+    <meta name="description" content="小说爬虫学习">
     <link rel="stylesheet" href="styles/class/font-awesome-4.7.0/css/font-awesome.css">
     <title>Fiction</title>
     <script src="JavaScript/class/jquery.min.js"></script>
@@ -30,7 +32,17 @@
     <link rel="stylesheet" type="text/css" href="styles/inline.css?v=2019042902">
     <script src="JavaScript/BooksSourceAPI.js?v=2019042902"></script>
     <script src="JavaScript/API.js?v=2019042902"></script>
+    <script>
+        // TODO add service worker code here
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker
+                .register('./service-worker.js')
+                .then(function () {
+                    console.log('Service Worker Registered');
+                });
+        }
 
+    </script>
 </head>
 <body>
 <div class="bookShelf">
