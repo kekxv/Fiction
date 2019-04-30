@@ -671,7 +671,7 @@ window.onload = function () {
                     if (this.search) {
                         window.history.back();
                     } else {
-                        this.UpdateBooksCache();
+                        this.UpdateData();
                     }
                 },
                 searchBook: function () {
