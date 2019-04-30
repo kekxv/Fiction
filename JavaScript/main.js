@@ -18,7 +18,7 @@ window.onload = function () {
 
     window.DB = new Database({
         DB: "book"
-        , version: 11
+        , version: 12
         , ObjectStore: [
             {
                 name: "books", keyPath: "title", Index: [
@@ -59,7 +59,7 @@ window.onload = function () {
                     Name: "笔趣阁",
                     Model: "m.tianxiabachang.cn",
                     url: "https://m.tianxiabachang.cn",
-                    ProxyUrl: "http://127.0.0.1/ProxyCrossDomain/",
+                    ProxyUrl: "https://proxycrossdomain.kekxv.com/",
                     isGBK: false,
                     search: {
                         url: "https://m.tianxiabachang.cn/s.php?s={{keyword}}",
@@ -107,7 +107,7 @@ window.onload = function () {
                     Name: "笔趣馆",
                     Model: "m.biquguan.com",
                     url: "https://m.biquguan.com",
-                    ProxyUrl: "http://127.0.0.1/ProxyCrossDomain/",
+                    ProxyUrl: "https://proxycrossdomain.kekxv.com/",
                     isGBK: false,
                     search: {
                         url: "https://m.biquguan.com/SearchBook.php",
@@ -155,7 +155,7 @@ window.onload = function () {
                     Name: "名著小说",
                     Model: "www.mingzhuxiaoshuo.com",
                     url: "http://www.mingzhuxiaoshuo.com",
-                    ProxyUrl: "http://127.0.0.1/ProxyCrossDomain/",
+                    ProxyUrl: "https://proxycrossdomain.kekxv.com/",
                     isGBK: true,
                     search: {
                         url: "http://www.mingzhuxiaoshuo.com/Search.asp?s={{keyword}}",
@@ -201,7 +201,7 @@ window.onload = function () {
                     Name: "幻月书院",
                     Model: "m.huanyue123.com",
                     url: "http://m.huanyue123.com",
-                    ProxyUrl: "http://127.0.0.1/ProxyCrossDomain/",
+                    ProxyUrl: "https://proxycrossdomain.kekxv.com/",
                     isGBK: false,
                     search: {
                         url: "http://m.huanyue123.com/s.php",
@@ -247,7 +247,7 @@ window.onload = function () {
                     Name: "零点看书",
                     Model: "m.lingdiankanshu.co",
                     url: "https://m.lingdiankanshu.co/",
-                    ProxyUrl: "http://127.0.0.1/ProxyCrossDomain/",
+                    ProxyUrl: "https://proxycrossdomain.kekxv.com/",
                     isGBK: false,
                     search: {
                         url: "https://m.lingdiankanshu.co/SearchBook.php?q={{keyword}}",
